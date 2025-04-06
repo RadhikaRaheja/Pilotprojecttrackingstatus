@@ -41,6 +41,12 @@
 
   <div class="pagination" id="pagination"></div>
 
+  <div class="jump-to">
+    <label for="pageInput">Jump to page:</label>
+    <input type="number" id="pageInput" min="1" />
+    <button onclick="jumpToPage()">Go</button>
+  </div>
+
   <div id="popup" class="popup">
     <div class="popup-content">
       <span class="close" onclick="closePopup()">&times;</span>
@@ -64,7 +70,7 @@ body {
   margin-top: 20px;
 }
 .brand-logo {
-  height: 70px;
+  height: 90px;
   border-radius: 20px;
 }
 .page-title {
@@ -100,6 +106,14 @@ th, td {
   margin: 0 5px;
   padding: 5px 10px;
 }
+.jump-to {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.jump-to input {
+  width: 60px;
+  text-align: center;
+}
 .popup {
   display: none;
   position: fixed;
@@ -113,10 +127,11 @@ th, td {
 }
 .popup-content {
   background-color: white;
-  margin: 10% auto;
-  padding: 20px;
+  margin: 8% auto;
+  padding: 30px;
   border-radius: 10px;
-  width: 50%;
+  width: 60%;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
 }
 .close {
   float: right;
@@ -134,6 +149,7 @@ footer {
 
 // script.js
 let allData = [];
+let filteredData = [];
 let currentPage = 1;
 const rowsPerPage = 10;
 const maxVisiblePages = 5;
@@ -156,6 +172,7 @@ async function fetchData() {
     row['Courier Link'] = courierMap[row['Courier Name']] || '';
   });
 
+  filteredData = allData;
   renderTable();
   setupPagination();
 }
@@ -166,7 +183,7 @@ function renderTable() {
 
   const start = (currentPage - 1) * rowsPerPage;
   const end = start + rowsPerPage;
-  const pageData = allData.slice(start, end);
+  const pageData = filteredData.slice(start, end);
 
   pageData.forEach(row => {
     const tr = document.createElement("tr");
@@ -185,7 +202,7 @@ function renderTable() {
 function setupPagination() {
   const pagination = document.getElementById("pagination");
   pagination.innerHTML = "";
-  const pageCount = Math.ceil(allData.length / rowsPerPage);
+  const pageCount = Math.ceil(filteredData.length / rowsPerPage);
   const startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
   const endPage = Math.min(pageCount, startPage + maxVisiblePages - 1);
 
@@ -207,13 +224,24 @@ function performSearch() {
   const value = document.getElementById("searchInput").value.toLowerCase();
   currentPage = 1;
 
-  const filtered = allData.filter(row =>
+  filteredData = allData.filter(row =>
     row[category] && row[category].toLowerCase().includes(value)
   );
 
-  allData = filtered;
   renderTable();
   setupPagination();
+}
+
+function jumpToPage() {
+  const input = document.getElementById("pageInput").value;
+  const page = parseInt(input);
+  const pageCount = Math.ceil(filteredData.length / rowsPerPage);
+
+  if (!isNaN(page) && page >= 1 && page <= pageCount) {
+    currentPage = page;
+    renderTable();
+    setupPagination();
+  }
 }
 
 function formatDate(dateStr) {
