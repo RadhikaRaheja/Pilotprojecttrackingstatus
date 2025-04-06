@@ -4,191 +4,221 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Track Your Order</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: sans-serif;
+      background: #f9f9f9;
       margin: 0;
       padding: 0;
-      background: #fff;
-      color: #333;
+    }
+    header {
+      text-align: center;
+      padding: 1rem;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .logo {
+      height: 60px;
+      border-radius: 16px;
     }
     .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
+      max-width: 1000px;
+      margin: 2rem auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
     .search-bar {
       display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 20px 0;
       flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
     }
-    select, input[type="text"], input[type="date"] {
-      padding: 8px;
-      font-size: 16px;
+    .search-bar select, .search-bar input {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      flex-grow: 1;
     }
-    button {
-      padding: 8px 16px;
+    .search-bar button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
       background: #000;
       color: #fff;
       border: none;
+      border-radius: 5px;
       cursor: pointer;
     }
     table {
       width: 100%;
       border-collapse: collapse;
     }
-    th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
-      text-align: center;
+    table th, table td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    table tr:hover {
+      background-color: #f1f1f1;
     }
     .pagination {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
+      text-align: center;
+      margin-top: 1rem;
     }
     .pagination button {
-      padding: 5px 10px;
+      margin: 0 5px;
+      padding: 0.4rem 0.8rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      background: #fff;
+      cursor: pointer;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+      color: #777;
     }
   </style>
 </head>
 <body>
+  <header>
+    <img src="https://github.com/Himanshu-Mittal001/Gurukul-Images/blob/main/CPN%20logo.jpg?raw=true" alt="Brand Logo" class="logo" />
+    <h1>Track Your Order</h1>
+  </header>
   <div class="container">
-    <h1>📦 Track Your Order</h1>
     <div class="search-bar">
-      <select id="category">
-        <option value="Customer Name">👤 Name</option>
+      <select id="search-category">
+        <option value="Customer Name">🔤 Name</option>
         <option value="Location (Pincode)">📍 Pincode</option>
         <option value="Date">📅 Date</option>
         <option value="Tracking ID">🧾 Tracking Code</option>
       </select>
-      <input type="text" id="searchInput" placeholder="Enter keyword" />
-      <input type="date" id="dateInput" style="display: none;" />
+      <input type="text" id="search-input" placeholder="Enter search value..." />
       <button onclick="searchData()">Search</button>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Name</th>
-          <th>Pincode</th>
-          <th>Courier</th>
-          <th>Tracking ID</th>
-          <th>Tracking Link</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-    </table>
-    <div class="pagination">
-      <button onclick="changePage(-1)">&laquo; Prev</button>
-      <span id="pageIndicator">Page 1</span>
-      <button onclick="changePage(1)">Next &raquo;</button>
+    <div id="table-container">
+      <table id="results-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Customer Name</th>
+            <th>Location</th>
+            <th>Courier Name</th>
+            <th>Tracking ID</th>
+            <th>Tracking Link</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
+    <div class="pagination" id="pagination"></div>
   </div>
+  <footer>
+    © Cute Printed Nightwears by Radhika ❤️
+  </footer>
 
   <script>
-    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw/gviz/tq?';
-    let originalData = [];
-    let filteredData = [];
+    const SHEET_ID = '1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw';
+    const DATA_URL = `https://opensheet.elk.sh/${SHEET_ID}/Daily Sales record`;
+    const COURIER_URL = `https://opensheet.elk.sh/${SHEET_ID}/CourierMapping`;
+
+    let allData = [];
     let courierMap = {};
     let currentPage = 1;
-    const itemsPerPage = 10;
+    let rowsPerPage = 10;
 
-    document.getElementById('category').addEventListener('change', () => {
-      const val = document.getElementById('category').value;
-      document.getElementById('searchInput').style.display = val === 'Date' ? 'none' : 'inline';
-      document.getElementById('dateInput').style.display = val === 'Date' ? 'inline' : 'none';
-    });
-
-    async function fetchSheetData(sheetName) {
-      const res = await fetch(`${SHEET_URL}sheet=${sheetName}`);
-      const text = await res.text();
-      const json = JSON.parse(text.substr(47).slice(0, -2));
-      return json.table.rows.map(row => row.c.map(cell => (cell ? cell.v : '')));
+    async function fetchCourierMapping() {
+      const res = await fetch(COURIER_URL);
+      const data = await res.json();
+      data.forEach(row => {
+        if (row['Courier Name'] && row['Tracking URL']) {
+          courierMap[row['Courier Name'].trim()] = row['Tracking URL'];
+        }
+      });
     }
 
-    function withinLast3Months(dateStr) {
-      const date = new Date(dateStr);
+    async function fetchData() {
+      await fetchCourierMapping();
+      const res = await fetch(DATA_URL);
+      const data = await res.json();
+
+      // Filter: only recent 3 months
       const now = new Date();
-      const past = new Date();
-      past.setMonth(now.getMonth() - 3);
-      return date >= past && date <= now;
+      allData = data.filter(row => {
+        const date = new Date(row['Date']);
+        return (now - date) <= 90 * 24 * 60 * 60 * 1000;
+      });
+
+      renderTable(allData);
     }
 
-    function renderTable() {
-      const start = (currentPage - 1) * itemsPerPage;
-      const pageItems = filteredData.slice(start, start + itemsPerPage);
-      document.getElementById('tableBody').innerHTML = pageItems.map(row => `
-        <tr>
-          <td>${row.date}</td>
-          <td>${row.name}</td>
-          <td>${row.pincode}</td>
-          <td>${row.courier}</td>
-          <td>${row.trackingId}</td>
-          <td>${row.trackingLink ? `<a href="${row.trackingLink}" target="_blank">Track</a>` : 'N/A'}</td>
-        </tr>
-      `).join('');
-      document.getElementById('pageIndicator').innerText = `Page ${currentPage}`;
+    function renderTable(data) {
+      const tbody = document.querySelector('#results-table tbody');
+      tbody.innerHTML = '';
+
+      let start = (currentPage - 1) * rowsPerPage;
+      let end = start + rowsPerPage;
+      let pageData = data.slice(start, end);
+
+      pageData.forEach(row => {
+        const tr = document.createElement('tr');
+        const trackingLink = courierMap[row['Courier Name']] || '';
+        tr.innerHTML = `
+          <td>${formatDate(row['Date'])}</td>
+          <td>${row['Customer Name'] || ''}</td>
+          <td>${row['Location (Pincode)'] || ''}</td>
+          <td>${row['Courier Name'] || ''}</td>
+          <td>${row['Tracking ID'] || ''}</td>
+          <td>${trackingLink ? `<a href="${trackingLink}" target="_blank">Visit Courier</a>` : ''}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      renderPagination(data.length);
     }
 
-    function changePage(delta) {
-      const maxPages = Math.ceil(filteredData.length / itemsPerPage);
-      currentPage = Math.max(1, Math.min(currentPage + delta, maxPages));
-      renderTable();
+    function formatDate(d) {
+      const date = new Date(d);
+      if (isNaN(date)) return '';
+      return date.toLocaleDateString('en-GB', {
+        day: '2-digit', month: 'short', year: 'numeric'
+      });
+    }
+
+    function renderPagination(total) {
+      const pageCount = Math.ceil(total / rowsPerPage);
+      const pagination = document.getElementById('pagination');
+      pagination.innerHTML = '';
+
+      for (let i = 1; i <= pageCount; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        if (i === currentPage) btn.style.backgroundColor = '#ddd';
+        btn.onclick = () => {
+          currentPage = i;
+          renderTable(allData);
+        };
+        pagination.appendChild(btn);
+      }
     }
 
     function searchData() {
-      const category = document.getElementById('category').value;
-      const keyword = category === 'Date'
-        ? new Date(document.getElementById('dateInput').value).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-        : document.getElementById('searchInput').value.toLowerCase();
-
-      filteredData = originalData.filter(row => {
-        const value = row[category.toLowerCase().replace(/\s+/g, '')];
-        return value.toLowerCase().includes(keyword);
-      });
+      const category = document.getElementById('search-category').value;
+      const term = document.getElementById('search-input').value.toLowerCase();
       currentPage = 1;
-      renderTable();
-    }
 
-    async function init() {
-      const [sales, mapping] = await Promise.all([
-        fetchSheetData('Daily Sales record'),
-        fetchSheetData('CourierMapping')
-      ]);
-
-      mapping.forEach(row => {
-        if (row[0] && row[2]) courierMap[row[0].toLowerCase()] = row[2];
+      const filtered = allData.filter(row => {
+        const value = row[category] || '';
+        return value.toLowerCase().includes(term);
       });
 
-      originalData = sales.map(row => {
-        const date = new Date(row[0]);
-        const formattedDate = date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-        const courierName = row[8] || '';
-        const trackingId = row[9] || '';
-        const baseUrl = courierMap[courierName.toLowerCase()] || '';
-        return {
-          date: formattedDate,
-          name: row[1] || '',
-          pincode: row[3] || '',
-          courier: courierName,
-          trackingId,
-          trackingLink: baseUrl && trackingId ? `${baseUrl}${trackingId}` : ''
-        };
-      }).filter(row => withinLast3Months(row.date));
-
-      filteredData = [...originalData];
-      renderTable();
+      renderTable(filtered);
     }
 
-    init();
+    fetchData();
   </script>
 </body>
 </html>
