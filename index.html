@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Track Your Order - Cute Printed Nightwears</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #f5d0e7, #d1c4e9);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .container {
+      background: white;
+      margin: 2rem;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      max-width: 1000px;
+      width: 100%;
+    }
+    .logo {
+      width: 100px;
+      border-radius: 20px;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    .search-section {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+      align-items: center;
+    }
+    select, input[type="text"], input[type="date"] {
+      padding: 8px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #ff69b4;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 8px 20px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background-color: #ff69b4;
+      color: white;
+    }
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .footer {
+      margin-top: auto;
+      text-align: center;
+      padding: 10px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div style="text-align:center">
+      <img class="logo" src="https://github.com/Himanshu-Mittal001/Gurukul-Images/blob/main/CPN%20logo.jpg?raw=true" alt="Logo">
+    </div>
+    <h2>📦 Track Your Order</h2>
+    <div class="search-section">
+      <label>🔍 Search by:</label>
+      <select id="searchType">
+        <option value="name">Name</option>
+        <option value="date">Date</option>
+        <option value="courier">Courier Name</option>
+      </select>
+      <input type="text" id="searchInput" placeholder="Enter keyword..." />
+      <input type="date" id="dateInput" style="display:none" />
+      <select id="courierDropdown" style="display:none"></select>
+      <button onclick="searchData()">Search</button>
+    </div>
+    <table id="trackingTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Name</th>
+          <th>Pincode</th>
+          <th>Courier</th>
+          <th>Tracking ID</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div class="pagination">
+      <button onclick="prevPage()">⬅️</button>
+      <span>Page <input type="number" id="pageInput" min="1" value="1" style="width: 60px; text-align: center;" onchange="goToPage(this.value)"/> of <span id="totalPages">1</span></span>
+      <button onclick="nextPage()">➡️</button>
+    </div>
+  </div>
+  <div class="footer">
+    © Cute Printed Nightwears by Radhika ❤️
+  </div>
+
+  <script>
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQBPnIA-q9wV3_9j7I9GSm2ojPO8SP-yk_dB0zrQ2uQ4UnHOz7aAKq9MekYPCJg2N9vPGs0LlnrcTLa/pub?gid=1817173253&single=true&output=csv';
+    let allData = [], filteredData = [], currentPage = 1, rowsPerPage = 10;
+
+    async function fetchData() {
+      const res = await fetch(SHEET_URL);
+      const text = await res.text();
+      const rows = text.split('\n').map(row => row.split(','));
+      const headers = rows.shift();
+      allData = rows.map(row => {
+        return {
+          date: formatDate(row[0]),
+          name: row[1],
+          pincode: row[3],
+          courier: row[8],
+          trackingId: row[9],
+          trackingLink: row[10]
+        };
+      }).filter(item => item.date);
+
+      populateCourierDropdown();
+      searchData();
+    }
+
+    function formatDate(dateStr) {
+      const d = new Date(dateStr);
+      if (isNaN(d)) return '';
+      return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function populateCourierDropdown() {
+      const courierDropdown = document.getElementById('courierDropdown');
+      const couriers = [...new Set(allData.map(item => item.courier).filter(Boolean))];
+      courierDropdown.innerHTML = '<option value="">Select Courier</option>' + couriers.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+
+    function searchData() {
+      const type = document.getElementById('searchType').value;
+      const keyword = document.getElementById('searchInput').value.toLowerCase();
+      const dateVal = document.getElementById('dateInput').value;
+      const courierVal = document.getElementById('courierDropdown').value;
+
+      filteredData = allData.filter(item => {
+        if (type === 'name') return item.name.toLowerCase().includes(keyword);
+        if (type === 'date') return item.date === formatDate(dateVal);
+        if (type === 'courier') return item.courier === courierVal;
+        return true;
+      });
+      currentPage = 1;
+      renderTable();
+    }
+
+    function renderTable() {
+      const tableBody = document.querySelector('#trackingTable tbody');
+      tableBody.innerHTML = '';
+      const start = (currentPage - 1) * rowsPerPage;
+      const paginatedData = filteredData.slice(start, start + rowsPerPage);
+      paginatedData.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.date}</td>
+          <td>${row.name}</td>
+          <td>${row.pincode}</td>
+          <td><a href="${row.trackingLink}" target="_blank">${row.courier}</a></td>
+          <td>${row.trackingId}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+      document.getElementById('totalPages').textContent = Math.ceil(filteredData.length / rowsPerPage);
+      document.getElementById('pageInput').value = currentPage;
+    }
+
+    function prevPage() {
+      if (currentPage > 1) {
+        currentPage--;
+        renderTable();
+      }
+    }
+
+    function nextPage() {
+      if (currentPage < Math.ceil(filteredData.length / rowsPerPage)) {
+        currentPage++;
+        renderTable();
+      }
+    }
+
+    function goToPage(page) {
+      const p = parseInt(page);
+      if (!isNaN(p) && p >= 1 && p <= Math.ceil(filteredData.length / rowsPerPage)) {
+        currentPage = p;
+        renderTable();
+      }
+    }
+
+    document.getElementById('searchType').addEventListener('change', function() {
+      document.getElementById('searchInput').style.display = 'none';
+      document.getElementById('dateInput').style.display = 'none';
+      document.getElementById('courierDropdown').style.display = 'none';
+      if (this.value === 'name') document.getElementById('searchInput').style.display = 'inline';
+      if (this.value === 'date') document.getElementById('dateInput').style.display = 'inline';
+      if (this.value === 'courier') document.getElementById('courierDropdown').style.display = 'inline';
+    });
+
+    fetchData();
+  </script>
+</body>
+</html>
