@@ -22,7 +22,7 @@ async function fetchData() {
     row['Courier Link'] = courierMap[row['Courier Name']] || '';
   });
 
-  filteredData = [...allData];
+  filteredData = allData;
   renderTable();
   setupPagination();
 }
@@ -53,10 +53,10 @@ function setupPagination() {
   const pagination = document.getElementById("pagination");
   pagination.innerHTML = "";
   const pageCount = Math.ceil(filteredData.length / rowsPerPage);
-
   let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
   let endPage = Math.min(pageCount, startPage + maxVisiblePages - 1);
-  if (endPage - startPage + 1 < maxVisiblePages) {
+
+  if (endPage - startPage < maxVisiblePages - 1) {
     startPage = Math.max(1, endPage - maxVisiblePages + 1);
   }
 
