@@ -22,6 +22,7 @@ function showPopup(row) {
       <p><b>Location:</b> ${row["Location (Pincode)"]}</p>
       <p><b>Courier:</b> <a href="${couriers[row["Courier Name"]] || '#'}" target="_blank">${row["Courier Name"]}</a></p>
       <p><b>Tracking ID:</b> ${row["Tracking ID"]}</p>
+      <p><b>Category:</b> ${row["Category"] || ''}</p>
     </div>
   `;
   document.getElementById('popupContent').innerHTML = content;
