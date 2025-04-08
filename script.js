@@ -115,11 +115,15 @@ function renderResults() {
   table.innerHTML = '';
   paginate(filteredData, currentPage).forEach(row => {
     const tr = document.createElement('tr');
+    const courierName = row["Courier Name"];
+    const courierLogo = courierName
+  ? `<img src="https://logo.clearbit.com/${courierName.toLowerCase().replace(/\s/g, '')}.com" alt="${courierName}" style="width:18px;height:18px;margin-right:6px;vertical-align:middle;border-radius:3px;" onerror="this.style.display='none'">`
+  : "";
     tr.innerHTML = `
       <td>${formatDate(row.Date)}</td>
       <td>${row["Customer Name"]}</td>
       <td>${row["Location (Pincode)"]}</td>
-      <td><a href="${couriers[row["Courier Name"]] || '#'}" target="_blank">${row["Courier Name"]}</a></td>
+      <td>${courierLogo}<a href="${couriers[courierName] || '#'}" target="_blank">${courierName}</a></td>
       <td>${row["Tracking ID"]}</td>
       <td>${row["Category"] || ''}</td>
     `;
