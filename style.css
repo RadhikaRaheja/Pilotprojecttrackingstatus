@@ -198,21 +198,26 @@ th {
   .search-bar {
     flex-direction: column;
     align-items: center;
+    gap: 12px;
   }
 
-  input, select, button {
-    width: 90%;
-    max-width: 320px;
+  .search-bar input,
+  .search-bar select,
+  .search-bar button {
+    width: 90% !important;
+    max-width: 300px;
+    box-sizing: border-box;
   }
 
-  .table-wrapper {
-    overflow-x: auto;
+  .search-btn {
+    width: 100%;
+    max-width: 200px;
   }
 
   table {
-    width: 100%;
     font-size: 13px;
-    min-width: unset;
+    width: 100%;
+    overflow-x: auto;
   }
 
   .popup {
@@ -229,10 +234,11 @@ th {
 
   .pagination {
     flex-direction: column;
+    align-items: center;
     gap: 6px;
   }
 
   .pagination input {
-    width: 40px;
+    width: 45px;
   }
 }
