@@ -110,20 +110,45 @@ function filterResults() {
   renderResults();
 }
 
+const courierLogos = {
+  "Delhivery": "https://logo.clearbit.com/delhivery.com",
+  "Bluedart": "https://logo.clearbit.com/bluedart.com",
+  "XpressBees": "https://logo.clearbit.com/xpressbees.com",
+  "DTDC": "https://logo.clearbit.com/dtdc.in",
+  "Shree Maruti Courier": "https://maruticourier.com/wp-content/uploads/2021/06/maruti-logo.png",
+  "Shree Tirupati Courier": "https://tirupaticourier.com/assets/img/logo.png",
+  "Trackon": "https://trackoncourier.com/assets/images/trackon-logo.png"
+};
+
 function renderResults() {
   const table = document.getElementById('resultsTable');
   table.innerHTML = '';
   paginate(filteredData, currentPage).forEach(row => {
     const tr = document.createElement('tr');
-    const courierName = row["Courier Name"];
-    const courierLogo = courierName
-  ? `<img src="https://logo.clearbit.com/${courierName.toLowerCase().replace(/\s/g, '')}.com" alt="${courierName}" style="width:18px;height:18px;margin-right:6px;vertical-align:middle;border-radius:3px;" onerror="this.style.display='none'">`
-  : "";
+    const courierName = row["Courier Name"] || '';
+  const trackingId = (row["Tracking ID"] || '').toLowerCase();
+  const courierLogo = courierLogos[courierName]
+    ? `<img src="${courierLogos[courierName]}" alt="${courierName}" style="width:18px;height:18px;margin-right:6px;vertical-align:middle;border-radius:3px;" />`
+    : '';
+
+  let courierDisplay = '';
+  if (courierName) {
+    courierDisplay = `${courierLogo}<a href="${couriers[courierName] || '#'}" target="_blank">${courierName}</a>`;
+  } else {
+    if (trackingId.includes('cancelled')) {
+      courierDisplay = `<span style="color:#e60000;font-weight:600;">❌ Cancelled</span>`;
+    } else if (trackingId.includes('delivered')) {
+      courierDisplay = `<span style="color:#28a745;font-weight:600;">✅ Delivered</span>`;
+    } else {
+      courierDisplay = `<span style="color:#888;">N/A</span>`;
+    }
+  }
+
     tr.innerHTML = `
       <td>${formatDate(row.Date)}</td>
       <td>${row["Customer Name"]}</td>
       <td>${row["Location (Pincode)"]}</td>
-      <td>${courierLogo}<a href="${couriers[courierName] || '#'}" target="_blank">${courierName}</a></td>
+       <td>${courierDisplay}</td> <!-- ✅ now using courierDisplay -->
       <td>${row["Tracking ID"]}</td>
       <td>${row["Category"] || ''}</td>
     `;
