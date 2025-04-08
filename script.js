@@ -27,12 +27,10 @@ function showPopup(row) {
   `;
   document.getElementById('popupContent').innerHTML = content;
   document.getElementById('popupOverlay').style.display = 'flex';
-  document.querySelector('.main-wrapper').classList.add('blur');
 }
 
 function hidePopup() {
   document.getElementById('popupOverlay').style.display = 'none';
-  document.querySelector('.main-wrapper').classList.remove('blur');
 }
 
 function paginate(data, page) {
