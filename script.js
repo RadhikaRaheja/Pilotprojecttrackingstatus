@@ -22,7 +22,8 @@ function showPopup(row) {
       <p><b>Location:</b> ${row["Location (Pincode)"]}</p>
       <p><b>Courier:</b> <a href="${couriers[row["Courier Name"]] || '#'}" target="_blank">${row["Courier Name"]}</a></p>
       <p><b>Tracking ID:</b> ${row["Tracking ID"]}</p>
-    </div>`;
+    </div>
+  `;
   document.getElementById('popupContent').innerHTML = content;
   document.getElementById('popupOverlay').style.display = 'flex';
 }
@@ -69,7 +70,7 @@ function jumpToPage() {
 async function fetchData() {
   document.querySelector('.loading').style.display = 'block';
   const response = await fetch('https://opensheet.elk.sh/1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw/Daily%20Sales%20record');
-  const result = await response.json();
+  let result = await response.json();
   const threeMonthsAgo = new Date();
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
   data = result.filter(row => new Date(row.Date) >= threeMonthsAgo);
@@ -84,7 +85,10 @@ async function loadCouriers() {
   const dropdown = document.getElementById('courierDropdown');
   map.forEach(entry => {
     couriers[entry['Courier Name']] = entry['Courier Website Link'];
-    dropdown.innerHTML += `<option value="${entry['Courier Name']}">${entry['Courier Name']}</option>`;
+    const option = document.createElement('option');
+    option.value = entry['Courier Name'];
+    option.textContent = entry['Courier Name'];
+    dropdown.appendChild(option);
   });
 }
 
@@ -100,6 +104,7 @@ function filterResults() {
     let value = field === 'Date' ? formatDate(row[field]) : row[field].toLowerCase();
     return value.includes(query);
   });
+
   currentPage = 1;
   renderResults();
 }
