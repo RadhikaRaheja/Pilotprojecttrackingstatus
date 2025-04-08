@@ -1,17 +1,19 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-   background: url('https://www.transparenttextures.com/patterns/diamond-upholstery.png'), linear-gradient(135deg, #eacdfc, #f6e8ff);
+  background: url('https://www.transparenttextures.com/patterns/diamond-upholstery.png'), linear-gradient(135deg, #eacdfc, #f6e8ff);
   background-blend-mode: overlay;
   background-size: cover;
   color: #333;
-    }
+  margin: 0;
+  padding: 0;
+}
 
-    .main-wrapper {
+.main-wrapper {
   max-width: 1000px;
   margin: 40px auto;
   padding: 20px;
   backdrop-filter: blur(6px);
-  background: rgba(255, 255, 255, 0.75); /* Translucent white effect */
+  background: rgba(255, 255, 255, 0.75);
   border-radius: 15px;
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
   z-index: 1;
@@ -19,100 +21,110 @@ body {
   text-align: center;
 }
 
-    .logo {
-      width: 160px;
-      border-radius: 20px;
-      display: block;
-      margin: 0 auto;
-    }
+.logo {
+  width: 130px;
+  border-radius: 20px;
+  display: block;
+  margin: 0 auto;
+}
 
-    h2 {
-      text-align: center;
-      margin: 20px 0;
-    }
+h2 {
+  text-align: center;
+  margin: 20px 0;
+}
 
-    .search-bar {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin: 20px 0;
-    }
+.search-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+}
 
-    input, select, button {
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
+input, select, button {
+  padding: 10px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  min-width: 150px;
+}
 
-    .search-btn {
-      background: #ff69b4;
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-    }
+.search-btn {
+  background: #ff69b4;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
 
-    .search-btn:hover {
-      background: #e60073;
-    }
+.search-btn:hover {
+  background: #e60073;
+}
 
-    .loading {
-      display: none;
-      text-align: center;
-    }
+.loading {
+  display: none;
+  text-align: center;
+}
 
-    table {
-  width: 90%;
-  margin: 20px auto;
+.table-wrapper {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+table {
+  width: 95%;
+  margin: 0 auto 20px auto;
   border-collapse: collapse;
   font-size: 15px;
-  background-color: rgba(255, 255, 255, 0.85); /* white background with transparency */
+  background-color: rgba(255, 255, 255, 0.85);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* subtle shadow for lift */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  min-width: 600px;
 }
 
 th,
 td {
-  padding: 8px;
+  padding: 10px;
   border: 1px solid #888;
   text-align: center;
-  background-color: rgba(255, 255, 255, 0.9); /* also add for better contrast inside */
+  background-color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
 }
 
+th {
+  background: #ff69b4;
+  color: white;
+  font-weight: 600;
+}
 
-    th {
-      background: #ff69b4;
-      color: white;
-    }
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+}
 
-    .pagination {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      margin: 20px 0;
-    }
+.pagination input {
+  text-align: center;
+  width: 50px;
+  border-radius: 5px;
+  padding: 6px;
+}
 
-    .pagination input {
-      text-align: center;
-      width: 50px;
-    }
+.popup-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background-color: rgba(0,0,0,0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
 
-    .popup-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background-color: rgba(0,0,0,0.6);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-    }
-
-    .popup {
+.popup {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -122,14 +134,15 @@ td {
   border-radius: 12px;
   box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.25);
   text-align: left;
-  width: 420px; /* Slightly wider */
+  width: 420px;
   max-width: 90%;
   font-family: 'Outfit', sans-serif;
+  z-index: 1000;
 }
 
 .popup-content {
   font-size: 16px;
-  line-height: 1.6; /* Increased line height for spacing */
+  line-height: 1.6;
 }
 
 .popup-content p {
@@ -137,7 +150,7 @@ td {
 }
 
 .popup-content p b {
-  font-weight: 600; /* Bold labels */
+  font-weight: 600;
   color: #333;
 }
 
@@ -169,31 +182,56 @@ td {
   background: #ff4081;
 }
 
+#copyright {
+  text-align: center;
+  margin-top: 30px;
+  font-size: 14px;
+}
 
-    #copyright {
-      text-align: center;
-      margin-top: 30px;
-      font-size: 14px;
-    }
+/* Mobile Responsive Fixes */
+@media screen and (max-width: 768px) {
+  .main-wrapper {
+    margin: 20px;
+    padding: 15px;
+  }
 
-    @media screen and (max-width: 768px) {
-      .search-bar {
-        flex-direction: column;
-        align-items: center;
-      }
+  .search-bar {
+    flex-direction: column;
+    align-items: center;
+  }
 
-      table {
-        font-size: 13px;
-      }
+  input, select, button {
+    width: 100%;
+  }
 
-      .popup {
-        padding: 20px;
-        font-size: 16px;
-      }
+  .table-wrapper {
+    overflow-x: auto;
+  }
 
-      .popup .close-btn {
-        float: none;
-        display: block;
-        margin: 0 auto 10px;
-      }
-    }
+  table {
+    width: 100%;
+    font-size: 13px;
+    min-width: unset;
+  }
+
+  .popup {
+    padding: 20px;
+    font-size: 14px;
+    width: 90%;
+  }
+
+  .popup .close-btn {
+    float: none;
+    display: block;
+    margin: 0 auto 10px;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .pagination input {
+    width: 40px;
+  }
+}
