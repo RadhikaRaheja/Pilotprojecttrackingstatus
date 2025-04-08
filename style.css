@@ -1,6 +1,6 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: url('Bgimage.jpg') no-repeat center center fixed;
+  background: url('https://papers.co/wallpaper/papers.co-sm33-pink-purple-blur-gradation-34-iphone6-plus-wallpaper.jpg') no-repeat center center fixed;
   background-size: cover;
   color: #333;
     }
@@ -9,7 +9,8 @@ body {
   max-width: 1000px;
   margin: 40px auto;
   padding: 20px;
-  background: rgba(255, 255, 255, 0.85); /* Translucent white effect */
+  backdrop-filter: blur(6px);
+  background: rgba(255, 255, 255, 0.75); /* Translucent white effect */
   border-radius: 15px;
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
   z-index: 1;
