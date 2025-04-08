@@ -21,12 +21,6 @@
   text-align: center;
 }
 
-.main-wrapper.blur {
-  filter: blur(4px);
-  transition: filter 0.3s ease;
-  pointer-events: none;
-}
-
 .logo {
   width: 130px;
   border-radius: 20px;
@@ -150,7 +144,7 @@ th {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: #ffffff;
+  background: white;
   padding: 25px;
   border-radius: 12px;
   box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.25);
@@ -166,11 +160,10 @@ th {
   position: fixed;
   top: 0; left: 0;
   width: 100vw; height: 100vh;
-  background-color: transparent; /* ✅ no overlay tint */
+  background-color: rgba(0, 0, 0, 0.3); /* optional soft background */
   z-index: 999;
   justify-content: center;
   align-items: center;
-  pointer-events: none;
 }
 
 .popup-content {
