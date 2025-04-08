@@ -1,6 +1,7 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: url('https://papers.co/wallpaper/papers.co-sm33-pink-purple-blur-gradation-34-iphone6-plus-wallpaper.jpg') no-repeat center center fixed;
+   background: url('https://www.transparenttextures.com/patterns/diamond-upholstery.png'), linear-gradient(135deg, #eacdfc, #f6e8ff);
+  background-blend-mode: overlay;
   background-size: cover;
   color: #333;
     }
