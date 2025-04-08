@@ -22,9 +22,7 @@ function showPopup(row) {
       <p><b>Location:</b> ${row["Location (Pincode)"]}</p>
       <p><b>Courier:</b> <a href="${couriers[row["Courier Name"]] || '#'}" target="_blank">${row["Courier Name"]}</a></p>
       <p><b>Tracking ID:</b> ${row["Tracking ID"]}</p>
-    </div>
-    <button class="close-btn" onclick="hidePopup()">Close</button>
-  `;
+    </div>`;
   document.getElementById('popupContent').innerHTML = content;
   document.getElementById('popupOverlay').style.display = 'flex';
 }
@@ -71,7 +69,7 @@ function jumpToPage() {
 async function fetchData() {
   document.querySelector('.loading').style.display = 'block';
   const response = await fetch('https://opensheet.elk.sh/1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw/Daily%20Sales%20record');
-  let result = await response.json();
+  const result = await response.json();
   const threeMonthsAgo = new Date();
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
   data = result.filter(row => new Date(row.Date) >= threeMonthsAgo);
@@ -126,43 +124,3 @@ function renderResults() {
 
 fetchData();
 loadCouriers();
-
-document.addEventListener("DOMContentLoaded", () => {
-  const searchBtn = document.querySelector(".search-btn");
-  const searchField = document.querySelector("input[type='text']");
-  const filterSelect = document.querySelector("select");
-  const rows = document.querySelectorAll("tbody tr");
-
-  const modalOverlay = document.querySelector(".modal-overlay");
-  const modal = document.querySelector(".modal");
-  const modalCloseBtns = modal.querySelectorAll("button");
-
-  searchBtn.addEventListener("click", () => {
-    const keyword = searchField.value.toLowerCase();
-    const filterBy = filterSelect.value;
-
-    rows.forEach(row => {
-      const cellValue = row.querySelector(`td[data-${filterBy}]`)?.textContent.toLowerCase() || "";
-      row.style.display = cellValue.includes(keyword) ? "" : "none";
-    });
-  });
-
-  rows.forEach(row => {
-    row.addEventListener("click", () => {
-      const cells = row.querySelectorAll("td");
-      modal.querySelector(".modal-date").textContent = cells[0].textContent;
-      modal.querySelector(".modal-name").textContent = cells[1].textContent;
-      modal.querySelector(".modal-pincode").textContent = cells[2].textContent;
-      modal.querySelector(".modal-courier").textContent = cells[3].textContent;
-      modal.querySelector(".modal-tracking").textContent = cells[4].textContent;
-
-      modalOverlay.style.display = "flex";
-    });
-  });
-
-  modalCloseBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      modalOverlay.style.display = "none";
-    });
-  });
-});
