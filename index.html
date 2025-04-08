@@ -2,52 +2,62 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Track Your Order</title>
-  <link rel="stylesheet" href="styles.css" />
-  <script defer src="script.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="logo-container">
-    <img src="https://github.com/Himanshu-Mittal001/Gurukul-Images/blob/main/CPN%20logo.jpg?raw=true" alt="Logo" class="brand-logo" />
-  </div>
-  <h1 class="page-title">📦 Track Your Order</h1>
+  <div class="main-wrapper">
+    <img src="assets/logo.jpg" class="logo" />
+    <h2>📦 Track Your Order</h2>
 
-  <div class="search-section">
-    <select id="searchCategory">
-      <option value="Customer Name">👤 Name</option>
-      <option value="Location">📍 Pincode</option>
-      <option value="Date">📅 Date</option>
-      <option value="Tracking ID">🔍 Tracking Code</option>
-    </select>
-    <input type="text" id="searchInput" placeholder="Enter search value..." />
-    <button onclick="performSearch()">Search</button>
-  </div>
+    <div class="search-bar">
+      <label for="searchField">🔍 Search by:</label>
+      <select id="searchField" onchange="handleSearchFieldChange()">
+        <option value="Customer Name">👤 Name</option>
+        <option value="Location (Pincode)">📍 Pincode</option>
+        <option value="Tracking ID">🔢 Tracking Code</option>
+        <option value="Date">📅 Date</option>
+      </select>
+      <input type="text" id="searchInput">
+      <input type="date" id="dateInput" style="display:none">
+      <select id="courierDropdown" style="display:none"></select>
+      <button class="search-btn" onclick="filterResults()">Search</button>
+    </div>
 
-  <div class="table-container">
-    <table id="data-table">
+    <div class="loading">⏳ Loading...</div>
+
+    <table>
       <thead>
         <tr>
           <th>Date</th>
-          <th>Customer Name</th>
-          <th>Location</th>
-          <th>Courier Name</th>
+          <th>Name</th>
+          <th>Pincode</th>
+          <th>Courier</th>
           <th>Tracking ID</th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody id="resultsTable"></tbody>
     </table>
-  </div>
 
-  <div class="pagination" id="pagination"></div>
-
-  <div id="popup" class="popup">
-    <div class="popup-content">
-      <span class="close" onclick="closePopup()">&times;</span>
-      <div id="popupDetails"></div>
+    <div class="pagination">
+      <button onclick="prevPage()">⬅️</button>
+      <span>Page <input type="number" id="pageNumber" min="1" onchange="jumpToPage()" /> of <span id="totalPages"></span></span>
+      <button onclick="nextPage()">➡️</button>
     </div>
+
+    <div class="popup-overlay" id="popupOverlay">
+      <div class="popup">
+        <button class="close-btn" onclick="hidePopup()">Close</button>
+        <div id="popupContent"></div>
+      </div>
+    </div>
+
+    <p id="copyright">© Cute Printed Nightwears by Radhika ❤️</p>
   </div>
 
-  <footer>© Cute Printed Nightwears by Radhika ❤️</footer>
+  <script src="script.js"></script>
 </body>
 </html>
