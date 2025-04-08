@@ -1,10 +1,8 @@
 body {
-      font-family: 'Outfit', sans-serif;
-      margin: 30px;
-      padding: 0;
-      color: #333;
-      background: rgba(255,255,255,0.85);
-      background-attachment: fixed;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: url('bg.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: #333;
     }
 
     .main-wrapper {
