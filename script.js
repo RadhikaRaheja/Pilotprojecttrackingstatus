@@ -120,6 +120,7 @@ function renderResults() {
       <td>${row["Location (Pincode)"]}</td>
       <td><a href="${couriers[row["Courier Name"]] || '#'}" target="_blank">${row["Courier Name"]}</a></td>
       <td>${row["Tracking ID"]}</td>
+      <td>${row["Category"] || ''}</td>
     `;
     tr.onclick = () => showPopup(row);
     table.appendChild(tr);
