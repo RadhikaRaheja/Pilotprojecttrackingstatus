@@ -1,5 +1,4 @@
 let allData = [];
-let filteredData = [];
 let currentPage = 1;
 const rowsPerPage = 10;
 const maxVisiblePages = 5;
@@ -22,7 +21,6 @@ async function fetchData() {
     row['Courier Link'] = courierMap[row['Courier Name']] || '';
   });
 
-  filteredData = allData;
   renderTable();
   setupPagination();
 }
@@ -33,7 +31,7 @@ function renderTable() {
 
   const start = (currentPage - 1) * rowsPerPage;
   const end = start + rowsPerPage;
-  const pageData = filteredData.slice(start, end);
+  const pageData = allData.slice(start, end);
 
   pageData.forEach(row => {
     const tr = document.createElement("tr");
@@ -52,13 +50,9 @@ function renderTable() {
 function setupPagination() {
   const pagination = document.getElementById("pagination");
   pagination.innerHTML = "";
-  const pageCount = Math.ceil(filteredData.length / rowsPerPage);
-  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-  let endPage = Math.min(pageCount, startPage + maxVisiblePages - 1);
-
-  if (endPage - startPage < maxVisiblePages - 1) {
-    startPage = Math.max(1, endPage - maxVisiblePages + 1);
-  }
+  const pageCount = Math.ceil(allData.length / rowsPerPage);
+  const startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+  const endPage = Math.min(pageCount, startPage + maxVisiblePages - 1);
 
   for (let i = startPage; i <= endPage; i++) {
     const btn = document.createElement("button");
@@ -78,10 +72,11 @@ function performSearch() {
   const value = document.getElementById("searchInput").value.toLowerCase();
   currentPage = 1;
 
-  filteredData = allData.filter(row =>
+  const filtered = allData.filter(row =>
     row[category] && row[category].toLowerCase().includes(value)
   );
 
+  allData = filtered;
   renderTable();
   setupPagination();
 }
@@ -90,7 +85,7 @@ function formatDate(dateStr) {
   const date = new Date(dateStr);
   if (isNaN(date)) return dateStr;
   const options = { day: '2-digit', month: 'short', year: 'numeric' };
-  return date.toLocaleDateString('en-GB', options);
+  return date.toLocaleDateString('en-GB', options).replace(/ /g, '-');
 }
 
 function showPopup(row) {
