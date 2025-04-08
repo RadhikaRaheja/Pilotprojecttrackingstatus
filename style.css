@@ -150,30 +150,27 @@ th {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0.2);
+  background: #ffffff;
   padding: 25px;
-  border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.25);
   text-align: left;
   width: 420px;
   max-width: 90%;
   font-family: 'Outfit', sans-serif;
   z-index: 1000;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .popup-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: auto;
   display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background-color: transparent; /* ✅ no overlay tint */
+  z-index: 999;
   justify-content: center;
   align-items: center;
-  z-index: 999;
+  pointer-events: none;
 }
 
 .popup-content {
