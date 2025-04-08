@@ -21,6 +21,12 @@
   text-align: center;
 }
 
+.main-wrapper.blur {
+  filter: blur(4px);
+  transition: filter 0.3s ease;
+  pointer-events: none;
+}
+
 .logo {
   width: 130px;
   border-radius: 20px;
@@ -144,15 +150,18 @@ th {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: white;
+  background: rgba(255, 255, 255, 0.2);
   padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.25);
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
   text-align: left;
   width: 420px;
   max-width: 90%;
   font-family: 'Outfit', sans-serif;
   z-index: 1000;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .popup-overlay {
