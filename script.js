@@ -6,6 +6,7 @@ function toggleAdmin() {
     isAdmin = true;
     alert("✅ Admin mode activated");
     showAdminFilters();
+    updateTableHeaders(); // NEW LINE
     renderResults();
   }
 }
@@ -59,6 +60,23 @@ function renderPaginationControls() {
   const totalPages = Math.ceil(filteredData.length / entriesPerPage);
   document.getElementById('totalPages').textContent = totalPages;
   document.getElementById('pageNumber').value = currentPage;
+}
+
+function updateTableHeaders() {
+  const head = document.getElementById("tableHead");
+  let html = `
+    <tr>
+      <th>Date</th>
+      <th>Name</th>
+      <th>Pincode</th>
+      <th>Courier</th>
+      <th>Tracking ID</th>
+      <th>Category</th>
+      ${isAdmin ? '<th>Vendor Name</th>' : ''}
+      ${isAdmin ? '<th>Reseller Name</th>' : ''}
+    </tr>
+  `;
+  head.innerHTML = html;
 }
 
 function prevPage() {
@@ -202,15 +220,16 @@ function renderResults() {
     }
 
     tr.innerHTML = `
-      <td>${formatDate(row.Date)}</td>
-      <td>${row["Customer Name"]}</td>
-      <td>${row["Location (Pincode)"]}</td>
-      <td>${courierDisplay}</td>
-      <td>${row["Tracking ID"]}</td>
-      <td>${row["Category"] || ''}</td>
-      ${isAdmin ? `<td>${row["Vendor Name"] || ''}</td>` : ''}
-      ${isAdmin ? `<td>${row["Reseller Name"] || ''}</td>` : ''}
-    `;
+  <td>${formatDate(row.Date)}</td>
+  <td>${row["Customer Name"]}</td>
+  <td>${row["Location (Pincode)"]}</td>
+  <td>${courierDisplay}</td>
+  <td>${row["Tracking ID"]}</td>
+  <td>${row["Category"] || ''}</td>
+  ${isAdmin ? `<td>${row["Vendor Name"] || ''}</td>` : ''}
+  ${isAdmin ? `<td>${row["Reseller Name"] || ''}</td>` : ''}
+`;
+
 
     tr.onclick = () => showPopup(row);
     table.appendChild(tr);
