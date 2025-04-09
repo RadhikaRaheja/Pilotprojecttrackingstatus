@@ -21,6 +21,25 @@
     <h2>📦 Track Your Order</h2>
     
     <div class="search-bar">
+      <div id="adminFilters" style="display:none; margin-top: 20px;">
+  <label>📅 Month:
+    <input type="month" id="adminMonth">
+  </label>
+  <label>🗓️ Week:
+    <input type="week" id="adminWeek">
+  </label>
+  <label>📆 Year:
+    <input type="number" id="adminYear" min="2000" max="2099">
+  </label>
+  <label>🔎 Vendor:
+    <input type="text" id="vendorFilter">
+  </label>
+  <label>🔎 Reseller:
+    <input type="text" id="resellerFilter">
+  </label>
+  <button onclick="applyAdminFilters()">Apply</button>
+</div>
+
       <label for="searchField">🔍 Search by:</label>
       <select id="searchField" onchange="handleSearchFieldChange()">
         <option value="Customer Name">👤 Name</option>
