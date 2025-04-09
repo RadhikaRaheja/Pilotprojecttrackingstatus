@@ -6,8 +6,8 @@ function toggleAdmin() {
     isAdmin = true;
     alert("✅ Admin mode activated");
     showAdminFilters();
-    updateTableHeaders(); // NEW LINE
-    renderResults();
+    updateTableHeaders(); // Updated: Refresh headers to show admin fields
+    renderResults(); // Updated: Refresh table to include admin data
   }
 }
 
@@ -202,7 +202,6 @@ function renderResults() {
   paginate(filteredData, currentPage).forEach(row => {
     const tr = document.createElement('tr');
 
-    // Safely assign courier name and tracking ID
     const courierName = (row["Courier Name"] || '').trim();
     const trackingId = (row["Tracking ID"] || '').toLowerCase();
 
@@ -220,16 +219,15 @@ function renderResults() {
     }
 
     tr.innerHTML = `
-  <td>${formatDate(row.Date)}</td>
-  <td>${row["Customer Name"]}</td>
-  <td>${row["Location (Pincode)"]}</td>
-  <td>${courierDisplay}</td>
-  <td>${row["Tracking ID"]}</td>
-  <td>${row["Category"] || ''}</td>
-  ${isAdmin ? `<td>${row["Vendor Name"] || ''}</td>` : ''}
-  ${isAdmin ? `<td>${row["Reseller Name"] || ''}</td>` : ''}
-`;
-
+      <td>${formatDate(row.Date)}</td>
+      <td>${row["Customer Name"]}</td>
+      <td>${row["Location (Pincode)"]}</td>
+      <td>${courierDisplay}</td>
+      <td>${row["Tracking ID"]}</td>
+      <td>${row["Category"] || ''}</td>
+      ${isAdmin ? `<td>${row["Vendor Name"] || ''}</td>` : ''}
+      ${isAdmin ? `<td>${row["Reseller Name"] || ''}</td>` : ''}
+    `;
 
     tr.onclick = () => showPopup(row);
     table.appendChild(tr);
@@ -238,6 +236,6 @@ function renderResults() {
   renderPaginationControls();
 }
 
-// Load data when page loads
+// Load data on page load
 fetchData();
 loadCouriers();
