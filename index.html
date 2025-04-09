@@ -58,7 +58,7 @@
     <div class="table-wrapper">
       <p id="resultsCount"></p>
     <table>
-      <thead>
+      <thead id="tableHead">
         <tr>
           <th>Date</th>
           <th>Name</th>
@@ -90,7 +90,11 @@
     <p id="copyright">© Cute Printed Nightwears by Radhika ❤️</p>
   </div>
 
-  <script src="script.js"></script>
+  <script src="script.js">
+    document.addEventListener("DOMContentLoaded", () => {
+    updateTableHeaders();
+  });
+  </script>
   <!-- Floating WhatsApp Help Button -->
 <a href="https://wa.me/918307358952?text=Hi%20Team,%20I%20need%20help%20tracking%20my%20order." target="_blank" class="floating-whatsapp" title="Chat with us on WhatsApp">
   <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" />
