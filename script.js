@@ -1,3 +1,13 @@
+let isAdmin = false;
+function toggleAdmin() {
+  const pass = prompt("Enter admin password:");
+  if (pass === "your_secret") {
+    isAdmin = true;
+    alert("Admin mode activated.");
+    renderResults(); // optional: show more
+  }
+}
+
 let data = [], filteredData = [], couriers = {}, currentPage = 1, entriesPerPage = 10;
 
 // Handle search field visibility
