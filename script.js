@@ -1,16 +1,3 @@
-let isAdmin = false;
-
-function toggleAdmin() {
-  const pass = prompt("Enter admin password:");
-  if (pass === "Raheja&1501") {
-    isAdmin = true;
-    alert("✅ Admin mode activated");
-    showAdminFilters();
-    updateTableHeaders(); // Updated: Refresh headers to show admin fields
-    renderResults(); // Updated: Refresh table to include admin data
-  }
-}
-
 let data = [], filteredData = [], couriers = {}, currentPage = 1, entriesPerPage = 10;
 
 // Handle search field visibility
@@ -31,7 +18,7 @@ function formatDate(inputDate) {
 
 // Show popup
 function showPopup(row) {
-  const content = `
+  const content = 
     <div class="popup-content">
       <p><b>Date:</b> ${formatDate(row.Date)}</p>
       <p><b>Name:</b> ${row["Customer Name"]}</p>
@@ -40,7 +27,7 @@ function showPopup(row) {
       <p><b>Tracking ID:</b> ${row["Tracking ID"]}</p>
       <p><b>Category:</b> ${row["Category"] || ''}</p>
     </div>
-  `;
+  ;
   document.getElementById('popupContent').innerHTML = content;
   document.getElementById('popupOverlay').style.display = 'flex';
 }
@@ -60,23 +47,6 @@ function renderPaginationControls() {
   const totalPages = Math.ceil(filteredData.length / entriesPerPage);
   document.getElementById('totalPages').textContent = totalPages;
   document.getElementById('pageNumber').value = currentPage;
-}
-
-function updateTableHeaders() {
-  const head = document.getElementById("tableHead");
-  let html = `
-    <tr>
-      <th>Date</th>
-      <th>Name</th>
-      <th>Pincode</th>
-      <th>Courier</th>
-      <th>Tracking ID</th>
-      <th>Category</th>
-      ${isAdmin ? '<th>Vendor Name</th>' : ''}
-      ${isAdmin ? '<th>Reseller Name</th>' : ''}
-    </tr>
-  `;
-  head.innerHTML = html;
 }
 
 function prevPage() {
@@ -134,47 +104,6 @@ async function loadCouriers() {
 function showAdminFilters() {
   document.getElementById('adminFilters').style.display = 'block';
 }
-function applyAdminFilters() {
-  const month = document.getElementById("adminMonth").value;
-  const week = document.getElementById("adminWeek").value;
-  const year = document.getElementById("adminYear").value;
-  const vendor = document.getElementById("vendorFilter").value.toLowerCase();
-  const reseller = document.getElementById("resellerFilter").value.toLowerCase();
-
-  filteredData = data.filter(row => {
-    const date = new Date(row.Date);
-
-    let match = true;
-
-    if (month) {
-      const [yearPart, monthPart] = month.split("-");
-      match = match && (date.getFullYear() == yearPart && (date.getMonth() + 1) == parseInt(monthPart));
-    }
-
-    if (week) {
-      const [weekYear, weekNumber] = week.split("-W");
-      const weekDate = new Date(date.getFullYear(), 0, 1 + (weekNumber - 1) * 7);
-      match = match && (weekDate.getFullYear() == weekYear);
-    }
-
-    if (year) {
-      match = match && (date.getFullYear() == year);
-    }
-
-    if (vendor) {
-      match = match && (row["Vendor Name"]?.toLowerCase().includes(vendor));
-    }
-
-    if (reseller) {
-      match = match && (row["Reseller Name"]?.toLowerCase().includes(reseller));
-    }
-
-    return match;
-  });
-
-  currentPage = 1;
-  renderResults();
-}
 
 function filterResults() {
   let field = document.getElementById('searchField').value;
@@ -197,37 +126,36 @@ function renderResults() {
   const table = document.getElementById('resultsTable');
   table.innerHTML = '';
 
-  document.getElementById('resultsCount').textContent = `🔍 Showing ${filteredData.length} results`;
+  document.getElementById('resultsCount').textContent = 🔍 Showing ${filteredData.length} results;
 
   paginate(filteredData, currentPage).forEach(row => {
     const tr = document.createElement('tr');
 
+    // Safely assign courier name and tracking ID
     const courierName = (row["Courier Name"] || '').trim();
     const trackingId = (row["Tracking ID"] || '').toLowerCase();
 
     let courierDisplay = '';
     if (courierName) {
-      courierDisplay = `<a href="${couriers[courierName] || '#'}" target="_blank">${courierName}</a>`;
+      courierDisplay = <a href="${couriers[courierName] || '#'}" target="_blank">${courierName}</a>;
     } else {
       if (trackingId.includes('cancelled')) {
-        courierDisplay = `<span style="color:#e60000;font-weight:600;">❌ Cancelled</span>`;
+        courierDisplay = <span style="color:#e60000;font-weight:600;">❌ Cancelled</span>;
       } else if (trackingId.includes('delivered')) {
-        courierDisplay = `<span style="color:#28a745;font-weight:600;">✅ Delivered</span>`;
+        courierDisplay = <span style="color:#28a745;font-weight:600;">✅ Delivered</span>;
       } else {
-        courierDisplay = `<span style="color:#888;">N/A</span>`;
+        courierDisplay = <span style="color:#888;">N/A</span>;
       }
     }
 
-    tr.innerHTML = `
+    tr.innerHTML = 
       <td>${formatDate(row.Date)}</td>
       <td>${row["Customer Name"]}</td>
       <td>${row["Location (Pincode)"]}</td>
       <td>${courierDisplay}</td>
       <td>${row["Tracking ID"]}</td>
       <td>${row["Category"] || ''}</td>
-      ${isAdmin ? `<td>${row["Vendor Name"] || ''}</td>` : ''}
-      ${isAdmin ? `<td>${row["Reseller Name"] || ''}</td>` : ''}
-    `;
+    ;
 
     tr.onclick = () => showPopup(row);
     table.appendChild(tr);
@@ -236,6 +164,6 @@ function renderResults() {
   renderPaginationControls();
 }
 
-// Load data on page load
+// Load data when page loads
 fetchData();
 loadCouriers();
