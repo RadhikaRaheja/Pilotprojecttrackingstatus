@@ -113,6 +113,10 @@ async function loadCouriers() {
 }
 
 // Filtering logic
+function showAdminFilters() {
+  document.getElementById('adminFilters').style.display = 'block';
+}
+
 function filterResults() {
   let field = document.getElementById('searchField').value;
   let query = '';
@@ -163,6 +167,8 @@ function renderResults() {
       <td>${courierDisplay}</td>
       <td>${row["Tracking ID"]}</td>
       <td>${row["Category"] || ''}</td>
+      ${isAdmin ? `<td>${row["Vendor Name"] || ''}</td>` : ''}
+      ${isAdmin ? `<td>${row["Reseller Name"] || ''}</td>` : ''}
     `;
 
     tr.onclick = () => showPopup(row);
