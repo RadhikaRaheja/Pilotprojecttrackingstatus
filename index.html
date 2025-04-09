@@ -8,17 +8,17 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
-  <!-- PWA: Add to home screen -->
-<link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="#ff69b4" />
-<meta name="mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#ff69b4" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
 </head>
 <body>
   <div class="main-wrapper">
     <img src="cpn.png" alt="Cute Printed Nightwears Logo" class="logo">
     <h2>📦 Track Your Order</h2>
 
+    <div class="search-bar">
       <label for="searchField">🔍 Search by:</label>
       <select id="searchField" onchange="handleSearchFieldChange()">
         <option value="Customer Name">👤 Name</option>
@@ -36,21 +36,19 @@
 
     <div class="table-wrapper">
       <p id="resultsCount"></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Name</th>
-          <th>Pincode</th>
-          <th>Courier</th>
-          <th>Tracking ID</th>
-          <th>Category</th>
-          <th>Vendor Name</th>
-          <th>Reseller Name</th>
-        </tr>
-      </thead>
-      <tbody id="resultsTable"></tbody>
-    </table>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Pincode</th>
+            <th>Courier</th>
+            <th>Tracking ID</th>
+            <th>Category</th>
+          </tr>
+        </thead>
+        <tbody id="resultsTable"></tbody>
+      </table>
     </div>
 
     <div class="pagination">
@@ -70,9 +68,8 @@
   </div>
 
   <script src="script.js"></script>
-  <!-- Floating WhatsApp Help Button -->
-<a href="https://wa.me/918307358952?text=Hi%20Team,%20I%20need%20help%20tracking%20my%20order." target="_blank" class="floating-whatsapp" title="Chat with us on WhatsApp">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" />
-</a>
+  <a href="https://wa.me/918307358952?text=Hi%20Team,%20I%20need%20help%20tracking%20my%20order." target="_blank" class="floating-whatsapp" title="Chat with us on WhatsApp">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" />
+  </a>
 </body>
 </html>
