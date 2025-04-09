@@ -116,6 +116,47 @@ async function loadCouriers() {
 function showAdminFilters() {
   document.getElementById('adminFilters').style.display = 'block';
 }
+function applyAdminFilters() {
+  const month = document.getElementById("adminMonth").value;
+  const week = document.getElementById("adminWeek").value;
+  const year = document.getElementById("adminYear").value;
+  const vendor = document.getElementById("vendorFilter").value.toLowerCase();
+  const reseller = document.getElementById("resellerFilter").value.toLowerCase();
+
+  filteredData = data.filter(row => {
+    const date = new Date(row.Date);
+
+    let match = true;
+
+    if (month) {
+      const [yearPart, monthPart] = month.split("-");
+      match = match && (date.getFullYear() == yearPart && (date.getMonth() + 1) == parseInt(monthPart));
+    }
+
+    if (week) {
+      const [weekYear, weekNumber] = week.split("-W");
+      const weekDate = new Date(date.getFullYear(), 0, 1 + (weekNumber - 1) * 7);
+      match = match && (weekDate.getFullYear() == weekYear);
+    }
+
+    if (year) {
+      match = match && (date.getFullYear() == year);
+    }
+
+    if (vendor) {
+      match = match && (row["Vendor Name"]?.toLowerCase().includes(vendor));
+    }
+
+    if (reseller) {
+      match = match && (row["Reseller Name"]?.toLowerCase().includes(reseller));
+    }
+
+    return match;
+  });
+
+  currentPage = 1;
+  renderResults();
+}
 
 function filterResults() {
   let field = document.getElementById('searchField').value;
