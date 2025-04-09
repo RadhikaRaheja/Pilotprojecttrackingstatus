@@ -1,10 +1,12 @@
 let isAdmin = false;
+
 function toggleAdmin() {
   const pass = prompt("Enter admin password:");
-  if (pass === "your_secret") {
+  if (pass === "Raheja&1501") {
     isAdmin = true;
-    alert("Admin mode activated.");
-    renderResults(); // optional: show more
+    alert("✅ Admin mode activated");
+    showAdminFilters();
+    renderResults();
   }
 }
 
