@@ -124,12 +124,7 @@ function renderResults() {
   table.innerHTML = '';
   paginate(filteredData, currentPage).forEach(row => {
     const tr = document.createElement('tr');
-
-    const trackingId = (row["Tracking ID"] || '').toLowerCase();
-    const courierLogo = courierLogos[courierName]
-      ? `<img src="${courierLogos[courierName]}" alt="${courierName}" style="width:18px;height:18px;margin-right:6px;vertical-align:middle;border-radius:3px;" onerror="this.style.display='none';" />`
-      : '';
-
+  
     let courierDisplay = '';
 if (courierName) {
   courierDisplay = `<a href="${couriers[courierName] || '#'}" target="_blank">${courierName}</a>`;
