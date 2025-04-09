@@ -118,25 +118,29 @@ function filterResults() {
   renderResults();
 }
 
-// Render results in table
 function renderResults() {
   const table = document.getElementById('resultsTable');
   table.innerHTML = '';
+
   paginate(filteredData, currentPage).forEach(row => {
     const tr = document.createElement('tr');
-  
+
+    // Safely assign courier name and tracking ID
+    const courierName = (row["Courier Name"] || '').trim();
+    const trackingId = (row["Tracking ID"] || '').toLowerCase();
+
     let courierDisplay = '';
-if (courierName) {
-  courierDisplay = `<a href="${couriers[courierName] || '#'}" target="_blank">${courierName}</a>`;
-} else {
-  if (trackingId.includes('cancelled')) {
-    courierDisplay = `<span style="color:#e60000;font-weight:600;">❌ Cancelled</span>`;
-  } else if (trackingId.includes('delivered')) {
-    courierDisplay = `<span style="color:#28a745;font-weight:600;">✅ Delivered</span>`;
-  } else {
-    courierDisplay = `<span style="color:#888;">N/A</span>`;
-  }
-}
+    if (courierName) {
+      courierDisplay = `<a href="${couriers[courierName] || '#'}" target="_blank">${courierName}</a>`;
+    } else {
+      if (trackingId.includes('cancelled')) {
+        courierDisplay = `<span style="color:#e60000;font-weight:600;">❌ Cancelled</span>`;
+      } else if (trackingId.includes('delivered')) {
+        courierDisplay = `<span style="color:#28a745;font-weight:600;">✅ Delivered</span>`;
+      } else {
+        courierDisplay = `<span style="color:#888;">N/A</span>`;
+      }
+    }
 
     tr.innerHTML = `
       <td>${formatDate(row.Date)}</td>
@@ -150,6 +154,7 @@ if (courierName) {
     tr.onclick = () => showPopup(row);
     table.appendChild(tr);
   });
+
   renderPaginationControls();
 }
 
