@@ -1,27 +1,5 @@
 let data = [], filteredData = [], couriers = {}, currentPage = 1, entriesPerPage = 10;
 
-// Courier logo map
-const courierLogos = {
-  "DTDC": "https://dtdc.com/assets/images/logo.png",
-  "Blue Dart": "https://bluedart.com/images/bluedart-logo.jpg",
-  "FedEx": "https://1000logos.net/wp-content/uploads/2017/03/FedEx-Logo.png",
-  "Delhivery": "https://logo.clearbit.com/delhivery.com",
-  "Shree Tirupati Courier": "https://tirupaticourier.com/assets/img/logo.png",
-  "Shree Mahavir Express": "https://shreemahavir.co.in/assets/images/logo/logo.png",
-  "India Post": "https://www.indiapost.gov.in/_layouts/images/DOP.GIF",
-  "First Flight": "https://www.firstflight.net/images/logo.gif",
-  "Gati": "https://www.gati.com/assets/images/logo.png",
-  "Madhur Courier": "https://www.madhurcourier.in/assets/img/logo.png",
-  "Shree Maruti Courier": "https://maruticourier.com/wp-content/uploads/2021/06/maruti-logo.png",
-  "Skyking": "https://skyking.co/images/logo.png",
-  "Trackon": "https://trackoncourier.com/assets/images/trackon-logo.png",
-  "Professional Couriers": "https://www.tpcindia.com/images/logo.jpg",
-  "Ecom Express": "https://ecomexpress.in/wp-content/uploads/2021/03/Ecom-Express-Logo.png",
-  "Shree Anjani": "https://shreeanjanicourier.com/images/logo.png",
-  "GSM Courier & Cargo": "https://gsmcourier.com/assets/images/logo.png",
-  "Amazon": "https://cdn.iconscout.com/icon/free/png-256/amazon-1869030-1583154.png"
-};
-
 // Handle search field visibility
 function handleSearchFieldChange() {
   const field = document.getElementById('searchField').value;
@@ -146,13 +124,6 @@ function renderResults() {
   table.innerHTML = '';
   paginate(filteredData, currentPage).forEach(row => {
     const tr = document.createElement('tr');
-    
-    // Normalize courier names
-    let courierName = (row["Courier Name"] || '').trim();
-    if (courierName.toLowerCase() === "tirupati") courierName = "Shree Tirupati Courier";
-    if (courierName.toLowerCase() === "maruti courier") courierName = "Shree Maruti Courier";
-    if (courierName.toLowerCase() === "mahavir") courierName = "Shree Mahavir Express";
-    if (courierName.toLowerCase().includes("professional")) courierName = "Professional Couriers";
 
     const trackingId = (row["Tracking ID"] || '').toLowerCase();
     const courierLogo = courierLogos[courierName]
@@ -160,17 +131,17 @@ function renderResults() {
       : '';
 
     let courierDisplay = '';
-    if (courierName) {
-      courierDisplay = `${courierLogo}<a href="${couriers[courierName] || '#'}" target="_blank">${courierName}</a>`;
-    } else {
-      if (trackingId.includes('cancelled')) {
-        courierDisplay = `<span style="color:#e60000;font-weight:600;">❌ Cancelled</span>`;
-      } else if (trackingId.includes('delivered')) {
-        courierDisplay = `<span style="color:#28a745;font-weight:600;">✅ Delivered</span>`;
-      } else {
-        courierDisplay = `<span style="color:#888;">N/A</span>`;
-      }
-    }
+if (courierName) {
+  courierDisplay = `<a href="${couriers[courierName] || '#'}" target="_blank">${courierName}</a>`;
+} else {
+  if (trackingId.includes('cancelled')) {
+    courierDisplay = `<span style="color:#e60000;font-weight:600;">❌ Cancelled</span>`;
+  } else if (trackingId.includes('delivered')) {
+    courierDisplay = `<span style="color:#28a745;font-weight:600;">✅ Delivered</span>`;
+  } else {
+    courierDisplay = `<span style="color:#888;">N/A</span>`;
+  }
+}
 
     tr.innerHTML = `
       <td>${formatDate(row.Date)}</td>
