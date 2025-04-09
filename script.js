@@ -147,10 +147,7 @@ function renderResults() {
       <td>${row["Customer Name"]}</td>
       <td>${row["Location (Pincode)"]}</td>
       <td>${courierDisplay}</td>
-      <td>
-  ${row["Tracking ID"]}
-  <button onclick="copyToClipboard('${row["Tracking ID"]}')">📋</button>
-</td>
+      <td>${row["Tracking ID"]}</td>
       <td>${row["Category"] || ''}</td>
     `;
 
