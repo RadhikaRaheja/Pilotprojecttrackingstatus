@@ -6,6 +6,25 @@ function handleSearchFieldChange() {
   document.getElementById('searchInput').style.display = (field === 'Date' || field === 'Courier Name') ? 'none' : 'inline-block';
   document.getElementById('dateInput').style.display = field === 'Date' ? 'inline-block' : 'none';
   document.getElementById('courierDropdown').style.display = field === 'Courier Name' ? 'inline-block' : 'none';
+  
+function populateSuggestions() {
+  const field = document.getElementById('searchField').value;
+  const suggestionsSet = new Set();
+
+  data.forEach(row => {
+    if (row[field]) {
+      suggestionsSet.add(row[field]);
+    }
+  });
+
+  const datalist = document.getElementById('suggestions');
+  datalist.innerHTML = '';
+  suggestionsSet.forEach(val => {
+    const option = document.createElement('option');
+    option.value = val;
+    datalist.appendChild(option);
+  });
+}
 }
 
 // Format date to DD-MMM-YYYY
