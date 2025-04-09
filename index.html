@@ -15,30 +15,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 </head>
 <body>
-  <button onclick="toggleAdmin()">🔐 Admin Mode</button>
   <div class="main-wrapper">
     <img src="cpn.png" alt="Cute Printed Nightwears Logo" class="logo">
     <h2>📦 Track Your Order</h2>
-    
-    <div class="search-bar">
-      <div id="adminFilters" style="display:none; margin-top: 20px;">
-  <label>📅 Month:
-    <input type="month" id="adminMonth">
-  </label>
-  <label>🗓️ Week:
-    <input type="week" id="adminWeek">
-  </label>
-  <label>📆 Year:
-    <input type="number" id="adminYear" min="2000" max="2099">
-  </label>
-  <label>🔎 Vendor:
-    <input type="text" id="vendorFilter">
-  </label>
-  <label>🔎 Reseller:
-    <input type="text" id="resellerFilter">
-  </label>
-  <button onclick="applyAdminFilters()">Apply</button>
-</div>
 
       <label for="searchField">🔍 Search by:</label>
       <select id="searchField" onchange="handleSearchFieldChange()">
@@ -58,7 +37,7 @@
     <div class="table-wrapper">
       <p id="resultsCount"></p>
     <table>
-      <thead id="tableHead">
+      <thead>
         <tr>
           <th>Date</th>
           <th>Name</th>
@@ -90,11 +69,7 @@
     <p id="copyright">© Cute Printed Nightwears by Radhika ❤️</p>
   </div>
 
-  <script src="script.js">
-    document.addEventListener("DOMContentLoaded", () => {
-    updateTableHeaders();
-  });
-  </script>
+  <script src="script.js"></script>
   <!-- Floating WhatsApp Help Button -->
 <a href="https://wa.me/918307358952?text=Hi%20Team,%20I%20need%20help%20tracking%20my%20order." target="_blank" class="floating-whatsapp" title="Chat with us on WhatsApp">
   <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" />
