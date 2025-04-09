@@ -122,6 +122,8 @@ function renderResults() {
   const table = document.getElementById('resultsTable');
   table.innerHTML = '';
 
+  document.getElementById('resultsCount').textContent = `🔍 Showing ${filteredData.length} results`;
+
   paginate(filteredData, currentPage).forEach(row => {
     const tr = document.createElement('tr');
 
