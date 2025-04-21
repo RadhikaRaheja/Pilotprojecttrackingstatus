@@ -55,11 +55,9 @@ function showPopup(row) {
       <p><b>Name:</b> ${row["Customer Name"]}</p>
       <p><b>Location:</b> ${row["Location (Pincode)"]}</p>
       <p><b>Courier:</b> ${row["Courier Name"] || 'N/A'}</p>
-      <p>
-  <b>Tracking ID:</b> 
-  <span id="copyTarget">${trackingId}</span> 
-  <button class="copy-btn" onclick="copyTrackingID()" title="Copy to clipboard">📋</button>
-</p>
+      <p><b>Tracking ID:</b> 
+  <span id="copyTarget">${trackingId}</span>
+  <button class="copy-btn" onclick="copyTrackingID()" title="Copy to clipboard">📝</button></p>
       <p><b>Category:</b> ${row["Category"] || ''}</p>
       ${trackButton}
     </div>
@@ -71,7 +69,7 @@ function showPopup(row) {
 function copyTrackingID() {
   const trackingText = document.getElementById("copyTarget").innerText;
   navigator.clipboard.writeText(trackingText)
-    .then(() => showToast("📋 Copied to clipboard!"))
+    .then(() => showToast("📝 Copied to clipboard!"))
     .catch(() => showToast("❌ Failed to copy."));
 }
 
