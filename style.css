@@ -301,37 +301,26 @@ th {
     width: 30px;
   }
 }
-
-.track-btn {
-  background: #ff69b4;
-  color: white;
-  padding: 10px 18px;
-  font-size: 14px;
-  border-radius: 8px;
-  border: none;
-  margin-top: 12px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background 0.3s ease;
-}
-
-.track-btn:hover {
-  background: #e60073;
-}
-
 .copy-btn {
   background: none;
   border: none;
-  cursor: pointer;
-  font-size: 16px;       /* Slightly smaller for 📝 */
-  margin-left: 4px;      /* Tighter spacing */
   padding: 0;
+  margin: 0;
+  font-size: 16px;
+  cursor: pointer;
+  display: inline;
   vertical-align: middle;
-  transition: transform 0.2s ease;
+  line-height: 1;
+}
+
+.tracking-id {
+  text-transform: uppercase;
+  display: inline;
+  margin-right: 2px; /* just enough to create a space between ID and icon */
 }
 
 .copy-btn:hover {
-  transform: scale(1.2);
+  transform: scale(1.15);
 }
 
 /* Toast notification styles */
