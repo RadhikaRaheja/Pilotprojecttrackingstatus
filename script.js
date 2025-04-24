@@ -1,3 +1,4 @@
+
 let data = [], filteredData = [], couriers = {}, currentPage = 1, entriesPerPage = 10;
 
 function handleSearchFieldChange() {
@@ -14,62 +15,25 @@ function formatDate(inputDate) {
   return date.toLocaleDateString('en-GB', options).replace(/ /g, '-');
 }
 
-function showPopup(row) {
-  const courier = (row["Courier Name"] || '').toLowerCase();
-  const trackingId = row["Tracking ID"];
-  
-  // Mapping of known courier tracking links
-  const trackingLinks = {
-    dtdc: `https://www.dtdc.in/track-trace.aspx?cn_no=${trackingId}`,
-    bluedart: `https://www.bluedart.com/tracking`,
-    fedex: `https://www.fedex.com/fedextrack/?tracknumbers=${trackingId}`,
-    delhivery: `https://www.delhivery.com/tracking?waybill=${trackingId}`,
-    indiapost: `https://www.indiapost.gov.in/VAS/Pages/trackconsignment.aspx`,
-    amazon: `https://track.amazon.in/`,
-    firstflight: `https://firstflightme.com/`,
-    shreetirupati: `http://www.shreetirupaticourier.net/index.aspx`,
-    mahavir: `http://shreemahavircourier.com/`,
-    gati: `https://www.gati.com/track-by-docket/`,
-    madhur: `https://www.madhurcouriers.in/(S(5mhmi5rxen0hy3xgxqtis5jr))/CNoteTracking`,
-    maruti: `https://www.shreemaruti.com/track-your-shipment/`,
-    skyking: `https://skyking.co/track`,
-    trackon: `https://www.trackon.in/courier-tracking`,
-    tpc: `https://www.tpcindia.com/`,
-    ecom: `https://www.ecomexpress.in/`,
-    anjani: `http://www.shreeanjanicourier.com/`,
-    gms: `https://www.gmsworldwide.com/`
-  };
-
-  // Try to find matching courier link
-  const courierKey = Object.keys(trackingLinks).find(key => courier.includes(key));
-  const trackingURL = courierKey ? trackingLinks[courierKey] : null;
-
-  const trackButton = trackingURL ? `
-    <button class="track-btn" onclick="window.open('${trackingURL}', '_blank')">🚚 Track Now</button>
-    ${trackingURL.includes(trackingId) ? '' : '<p style="font-size: 12px; margin-top: 5px;">Paste the tracking ID manually if prompted.</p>'}
-  ` : `<p style="color:red;">❌ Live tracking not available for this courier.</p>`;
-
+function showPopup(row, trackingId) {
   const content = `
     <div class="popup-content">
       <p><b>Date:</b> ${formatDate(row.Date)}</p>
       <p><b>Name:</b> ${row["Customer Name"]}</p>
       <p><b>Location:</b> ${row["Location (Pincode)"]}</p>
-      <p><b>Courier:</b> ${row["Courier Name"] || 'N/A'}</p>
-      <p><b>Tracking ID:</b> 
-  <span id="copyTarget">${trackingId}</span>
-  <button class="copy-btn" onclick="copyTrackingID()" title="Copy to clipboard">📝</button></p>
+      <p><b>Courier:</b> <a href="${couriers[row["Courier Name"]] || '#'}" target="_blank">${row["Courier Name"]}</a></p>
+     <p><b>Tracking ID:</b> <span class="tracking-id" id="copyTarget">${trackingId.toUpperCase()}</span><button class="copy-btn" onclick="copyTrackingID()" title="Copy to clipboard">📝</button></p>
       <p><b>Category:</b> ${row["Category"] || ''}</p>
-      ${trackButton}
     </div>
   `;
-  
   document.getElementById('popupContent').innerHTML = content;
   document.getElementById('popupOverlay').style.display = 'flex';
 }
+
 function copyTrackingID() {
   const trackingText = document.getElementById("copyTarget").innerText;
   navigator.clipboard.writeText(trackingText)
-    .then(() => showToast("📝 Copied to clipboard!"))
+    .then(() => showToast("📋 Copied to clipboard!"))
     .catch(() => showToast("❌ Failed to copy."));
 }
 
@@ -198,7 +162,7 @@ function renderResults() {
       <td>${row["Category"] || ''}</td>
     `;
 
-    tr.onclick = () => showPopup(row);
+    tr.onclick = () => showPopup(row, trackingId);
     table.appendChild(tr);
   });
 
