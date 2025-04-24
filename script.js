@@ -24,7 +24,9 @@ function showPopup(row, trackingId) {
       <p><b>Courier:</b> <a href="${couriers[row["Courier Name"]] || '#'}" target="_blank">${row["Courier Name"]}</a></p>
      <p><b>Tracking ID:</b> <span class="tracking-id" id="copyTarget">${trackingId.toUpperCase()}</span><button class="copy-btn" onclick="copyTrackingID()" title="Copy to clipboard">📝</button></p>
       <p><b>Category:</b> ${row["Category"] || ''}</p>
-    </div>
+     <p><button class="share-btn" onclick="shareTrackingInfo('${trackingId}', '${row["Customer Name"]}', '${row["Location (Pincode)"]}', '${row["Courier Name"]}', '${row["Category"] || ''}', '${formatDate(row.Date)}')">📤 Share</button></p>
+ </div>
+
   `;
   document.getElementById('popupContent').innerHTML = content;
   document.getElementById('popupOverlay').style.display = 'flex';
@@ -35,6 +37,35 @@ function copyTrackingID() {
   navigator.clipboard.writeText(trackingText)
     .then(() => showToast("📋 Copied to clipboard!"))
     .catch(() => showToast("❌ Failed to copy."));
+}
+
+function shareTrackingInfo(trackingId, name, location, courier, category, date) {
+  const message = `📦 *Order Details*:
+👤 *Name:* ${name}
+📍 *Location:* ${location}
+📅 *Date:* ${date}
+🚚 *Courier:* ${courier}
+🔢 *Tracking ID:* ${trackingId}
+📂 *Category:* ${category}`;
+
+  const encodedMsg = encodeURIComponent(message);
+
+  // For WhatsApp Web or App
+  const waLink = `https://wa.me/?text=${encodedMsg}`;
+
+  // Try Web Share API first
+  if (navigator.share) {
+    navigator.share({
+      title: 'Order Tracking Details',
+      text: message,
+    }).catch(err => {
+      // fallback if user cancels or fails
+      window.open(waLink, '_blank');
+    });
+  } else {
+    // Fallback for devices without Web Share API
+    window.open(waLink, '_blank');
+  }
 }
 
 function showToast(message) {
