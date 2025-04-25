@@ -39,93 +39,67 @@ function copyTrackingID() {
     .catch(() => showToast("❌ Failed to copy."));
 }
 
-async function generatePDFReceipt(trackingId, name, location, courier, category, date) {
-  const { jsPDF } = window.jspdf;
-  
-  // Create a narrow receipt-style page (80mm width)
-  const doc = new jsPDF({
-    orientation: 'portrait',
-    unit: 'mm',
-    format: [80, 160], // Width: 80mm, Height: 160mm (adjustable)
+async async function generateAndShareReceipt(order) {
+  // Fill in receipt content
+  document.getElementById('receiptDate').innerText = order.date;
+  document.getElementById('receiptName').innerText = order.name;
+  document.getElementById('receiptPincode').innerText = order.pincode;
+  document.getElementById('receiptCourier').innerText = order.courier;
+  document.getElementById('receiptTracking').innerText = order.trackingId.toUpperCase();
+  document.getElementById('receiptCategory').innerText = order.category;
+
+  // Set product image based on category
+  const categoryImages = {
+    "Nightwear": "https://yourdomain.com/nightwear.png",
+    "Footwear": "https://yourdomain.com/footwear.png",
+    "Western Clothing": "https://yourdomain.com/western.png",
+    // Add more mappings
+  };
+  document.getElementById('receiptProductImage').src = categoryImages[order.category] || '';
+
+  // Generate barcode
+  JsBarcode("#barcode", order.trackingId.toUpperCase(), {
+    format: "CODE128",
+    displayValue: true,
+    fontSize: 14,
+    width: 2
   });
 
-  const trackingLinks = {
-    dtdc: `https://www.dtdc.in/track-trace.aspx?cn_no=${trackingId}`,
-    bluedart: `https://www.bluedart.com/tracking`,
-    fedex: `https://www.fedex.com/fedextrack/?tracknumbers=${trackingId}`,
-    delhivery: `https://www.delhivery.com/tracking?waybill=${trackingId}`,
-    indiapost: `https://www.indiapost.gov.in/VAS/Pages/trackconsignment.aspx`,
-    amazon: `https://track.amazon.in/`,
-    firstflight: `https://firstflightme.com/`,
-    shreetirupati: `http://www.shreetirupaticourier.net/index.aspx`,
-    mahavir: `http://shreemahavircourier.com/`,
-    gati: `https://www.gati.com/track-by-docket/`,
-    madhur: `https://www.madhurcouriers.in/(S(5mhmi5rxen0hy3xgxqtis5jr))/CNoteTracking`,
-    maruti: `https://www.shreemaruti.com/track-your-shipment/`,
-    skyking: `https://skyking.co/track`,
-    trackon: `https://www.trackon.in/courier-tracking`,
-    tpc: `https://www.tpcindia.com/`,
-    ecom: `https://www.ecomexpress.in/`,
-    anjani: `http://www.shreeanjanicourier.com/`,
-    gms: `https://www.gmsworldwide.com/`
-  };
+  // Make receipt visible temporarily
+  const receipt = document.getElementById('receipt');
+  receipt.style.display = "block";
 
-  const courierKey = Object.keys(trackingLinks).find(key => courier.toLowerCase().includes(key));
-  const trackingURL = courierKey ? trackingLinks[courierKey] : 'N/A';
+  // Capture and generate PDF
+  const canvas = await html2canvas(receipt);
+  const imgData = canvas.toDataURL('image/png');
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: [80, 160] // 80mm wide like real receipt
+  });
 
-  // Use typewriter font
-  doc.setFont('courier', 'normal');
-  doc.setFontSize(10);
+  pdf.addImage(imgData, 'PNG', 0, 0, 80, 160);
+  const pdfBlob = pdf.output('blob');
 
-  let y = 10;
-  const lineHeight = 5;
+  const file = new File([pdfBlob], `Receipt_${order.trackingId}.pdf`, { type: 'application/pdf' });
 
-  // Brand header
-  doc.setFontSize(12);
-  doc.text("Cute Printed Nightwears", 40, y, { align: "center" }); y += lineHeight;
-  doc.text("by Radhika", 40, y, { align: "center" }); y += lineHeight + 2;
-  doc.setFontSize(10);
-
-  doc.text("🧾 ORDER RECEIPT", 40, y, { align: "center" }); y += lineHeight + 2;
-
-  doc.text(`Date       : ${date}`, 10, y); y += lineHeight;
-  doc.text(`Name       : ${name}`, 10, y); y += lineHeight;
-  doc.text(`Pincode    : ${location}`, 10, y); y += lineHeight;
-  doc.text(`Courier    : ${courier}`, 10, y); y += lineHeight;
-  doc.text(`Track Link :`, 10, y); y += lineHeight;
-  doc.text(`${trackingURL}`, 10, y); y += lineHeight;
-  doc.text(`Tracking ID: ${trackingId.toUpperCase()}`, 10, y); y += lineHeight;
-  doc.text(`Category   : ${category}`, 10, y); y += lineHeight + 2;
-
-  // Separator
-  doc.text("=".repeat(32), 10, y); y += lineHeight;
-
-  // Thank you note
-  doc.text("Thank you for shopping with us!", 40, y, { align: "center" }); y += lineHeight;
-  doc.text("❤️", 40, y, { align: "center" });
-
-  // Generate Blob URL and use Web Share if available
-  const pdfBlob = doc.output('blob');
-  const pdfUrl = URL.createObjectURL(pdfBlob);
-
-  if (navigator.canShare && navigator.canShare({ files: [new File([pdfBlob], `Receipt_${trackingId}.pdf`, { type: 'application/pdf' })] })) {
-    const file = new File([pdfBlob], `Receipt_${trackingId}.pdf`, { type: 'application/pdf' });
-    navigator.share({
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    await navigator.share({
       title: 'Order Receipt',
       text: 'Here is your receipt from Cute Printed Nightwears by Radhika.',
       files: [file]
-    }).catch(() => {
-      window.open(pdfUrl, '_blank'); // Fallback if sharing is canceled
     });
   } else {
-    // Fallback: trigger download
+    // Fallback for browsers that don't support sharing
     const link = document.createElement('a');
-    link.href = pdfUrl;
-    link.download = `Receipt_${trackingId}.pdf`;
-    document.body.appendChild(link);
+    link.href = URL.createObjectURL(pdfBlob);
+    link.download = `Receipt_${order.trackingId}.pdf`;
     link.click();
-    link.remove();
   }
+
+  // Hide receipt again
+  receipt.style.display = "none";
 }
 
 function showToast(message) {
