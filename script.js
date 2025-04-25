@@ -39,7 +39,7 @@ function copyTrackingID() {
     .catch(() => showToast("❌ Failed to copy."));
 }
 
-async async function generateAndShareReceipt(order) {
+async function generateAndShareReceipt(order) {
   // Fill in receipt content
   document.getElementById('receiptDate').innerText = order.date;
   document.getElementById('receiptName').innerText = order.name;
