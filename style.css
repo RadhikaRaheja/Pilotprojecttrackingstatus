@@ -365,3 +365,68 @@ th {
 .share-btn:hover {
   background: #1ebe5d;
 }
+
+/* Receipt container */
+.receipt-wrapper {
+  width: 300px;
+  padding: 10px 20px;
+  background: #fff;
+  color: #000;
+  font-family: 'Poppins', sans-serif;
+  border: 1px dashed #ddd;
+  margin: auto;
+  display: none; /* Hidden by default for export only */
+}
+
+/* Branding */
+.receipt h2.brand {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 5px 0 0;
+}
+
+.receipt p.brand-sub {
+  text-align: center;
+  font-size: 13px;
+  margin: 0 0 10px;
+  font-style: italic;
+  color: #ff69b4;
+}
+
+/* Order info section */
+.order-info p {
+  font-size: 12px;
+  margin: 4px 0;
+}
+
+/* Product image section */
+.product-image {
+  text-align: center;
+  margin: 10px 0;
+}
+
+.product-image img {
+  max-width: 80px;
+  border-radius: 6px;
+}
+
+/* Barcode */
+.barcode-container {
+  text-align: center;
+  margin: 10px 0;
+}
+
+#barcode {
+  width: 100%;
+  height: 40px;
+}
+
+/* Footer */
+.thankyou {
+  text-align: center;
+  font-size: 12px;
+  margin-top: 10px;
+  border-top: 1px dashed #ddd;
+  padding-top: 8px;
+}
