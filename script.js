@@ -47,10 +47,10 @@ function copyTrackingID() {
 
 function shareReceiptMessage(order) {
   const trackingLinks = {
-    dtdc: `https://www.dtdc.in/track-trace.aspx?cn_no=${order.trackingId}`,
+    dtdc: `https://www.dtdc.in/trace.asp`,
     bluedart: `https://www.bluedart.com/tracking`,
-    fedex: `https://www.fedex.com/fedextrack/?tracknumbers=${order.trackingId}`,
-    delhivery: `https://www.delhivery.com/tracking?waybill=${order.trackingId}`,
+    fedex: `https://www.fedex.com/fedextrack/`,
+    delhivery: `https://www.delhivery.com/`,
     indiapost: `https://www.indiapost.gov.in/VAS/Pages/trackconsignment.aspx`,
     amazon: `https://track.amazon.in/`,
     firstflight: `https://firstflightme.com/`,
