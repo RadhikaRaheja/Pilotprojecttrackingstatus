@@ -24,7 +24,7 @@ function showPopup(row, trackingId) {
       <p><b>Courier:</b> <a href="${couriers[row["Courier Name"]] || '#'}" target="_blank">${row["Courier Name"]}</a></p>
      <p><b>Tracking ID:</b> <span class="tracking-id" id="copyTarget">${trackingId.toUpperCase()}</span><button class="copy-btn" onclick="copyTrackingID()" title="Copy to clipboard">📝</button></p>
       <p><b>Category:</b> ${row["Category"] || ''}</p>
-     <p><button class="share-btn" onclick="shareTrackingInfo('${trackingId}', '${row["Customer Name"]}', '${row["Location (Pincode)"]}', '${row["Courier Name"]}', '${row["Category"] || ''}', '${formatDate(row.Date)}')">📤 Share</button></p>
+     <p><button class="share-btn" onclick="generatePDFReceipt('${trackingId}', '${row["Customer Name"]}', '${row["Location (Pincode)"]}', '${row["Courier Name"]}', '${row["Category"] || ''}', '${formatDate(row.Date)}')">📄 Download PDF Receipt</button></p>
  </div>
 
   `;
@@ -39,7 +39,10 @@ function copyTrackingID() {
     .catch(() => showToast("❌ Failed to copy."));
 }
 
-function shareTrackingInfo(trackingId, name, location, courier, category, date) {
+async function generatePDFReceipt(trackingId, name, location, courier, category, date) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
   const trackingLinks = {
     dtdc: `https://www.dtdc.in/track-trace.aspx?cn_no=${trackingId}`,
     bluedart: `https://www.bluedart.com/tracking`,
@@ -62,33 +65,32 @@ function shareTrackingInfo(trackingId, name, location, courier, category, date) 
   };
 
   const courierKey = Object.keys(trackingLinks).find(key => courier.toLowerCase().includes(key));
-  const trackingURL = courierKey ? trackingLinks[courierKey] : null;
+  const trackingURL = courierKey ? trackingLinks[courierKey] : 'N/A';
 
-  const message = `🧾 *Order Receipt*\n
-📅 *Date:* ${date}
-👤 *Name:* ${name}
-📍 *Pincode:* ${location}
+  const lineHeight = 10;
+  let y = 20;
 
-🚚 *Courier:* ${courier}
-🔗 *Track:* ${trackingURL || 'N/A'}
+  // Set typewriter-style font
+  doc.setFont('courier', 'normal');
+  doc.setFontSize(12);
 
-🔢 *Tracking ID:* ${trackingId}
-📂 *Category:* ${category}
+  doc.text("🧾 Order Receipt", 20, y);
+  y += lineHeight;
 
-━━━━━━━━━━━━━━━━━━
-Thank you for shopping with us! ❤️`;
+  doc.text(`Date       : ${date}`, 20, y); y += lineHeight;
+  doc.text(`Name       : ${name}`, 20, y); y += lineHeight;
+  doc.text(`Pincode    : ${location}`, 20, y); y += lineHeight;
+  doc.text(`Courier    : ${courier}`, 20, y); y += lineHeight;
+  doc.text(`Track Link : ${trackingURL}`, 20, y); y += lineHeight;
+  doc.text(`Tracking ID: ${trackingId}`, 20, y); y += lineHeight;
+  doc.text(`Category   : ${category}`, 20, y); y += lineHeight;
 
-  const encodedMsg = encodeURIComponent(message);
-  const waLink = `https://wa.me/?text=${encodedMsg}`;
+  y += lineHeight;
+  doc.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━", 20, y); y += lineHeight;
+  doc.text("Thank you for shopping with us! ❤️", 20, y);
 
-  if (navigator.share) {
-    navigator.share({
-      title: 'Order Receipt',
-      text: message
-    }).catch(() => window.open(waLink, '_blank'));
-  } else {
-    window.open(waLink, '_blank');
-  }
+  // Download the PDF
+  doc.save(`OrderReceipt_${trackingId}.pdf`);
 }
 
 function showToast(message) {
