@@ -41,7 +41,13 @@ function copyTrackingID() {
 
 async function generatePDFReceipt(trackingId, name, location, courier, category, date) {
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+  
+  // Create a narrow receipt-style page (80mm width)
+  const doc = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: [80, 160], // Width: 80mm, Height: 160mm (adjustable)
+  });
 
   const trackingLinks = {
     dtdc: `https://www.dtdc.in/track-trace.aspx?cn_no=${trackingId}`,
@@ -67,30 +73,59 @@ async function generatePDFReceipt(trackingId, name, location, courier, category,
   const courierKey = Object.keys(trackingLinks).find(key => courier.toLowerCase().includes(key));
   const trackingURL = courierKey ? trackingLinks[courierKey] : 'N/A';
 
-  const lineHeight = 10;
-  let y = 20;
-
-  // Set typewriter-style font
+  // Use typewriter font
   doc.setFont('courier', 'normal');
+  doc.setFontSize(10);
+
+  let y = 10;
+  const lineHeight = 5;
+
+  // Brand header
   doc.setFontSize(12);
+  doc.text("Cute Printed Nightwears", 40, y, { align: "center" }); y += lineHeight;
+  doc.text("by Radhika", 40, y, { align: "center" }); y += lineHeight + 2;
+  doc.setFontSize(10);
 
-  doc.text("🧾 Order Receipt", 20, y);
-  y += lineHeight;
+  doc.text("🧾 ORDER RECEIPT", 40, y, { align: "center" }); y += lineHeight + 2;
 
-  doc.text(`Date       : ${date}`, 20, y); y += lineHeight;
-  doc.text(`Name       : ${name}`, 20, y); y += lineHeight;
-  doc.text(`Pincode    : ${location}`, 20, y); y += lineHeight;
-  doc.text(`Courier    : ${courier}`, 20, y); y += lineHeight;
-  doc.text(`Track Link : ${trackingURL}`, 20, y); y += lineHeight;
-  doc.text(`Tracking ID: ${trackingId}`, 20, y); y += lineHeight;
-  doc.text(`Category   : ${category}`, 20, y); y += lineHeight;
+  doc.text(`Date       : ${date}`, 10, y); y += lineHeight;
+  doc.text(`Name       : ${name}`, 10, y); y += lineHeight;
+  doc.text(`Pincode    : ${location}`, 10, y); y += lineHeight;
+  doc.text(`Courier    : ${courier}`, 10, y); y += lineHeight;
+  doc.text(`Track Link :`, 10, y); y += lineHeight;
+  doc.text(`${trackingURL}`, 10, y); y += lineHeight;
+  doc.text(`Tracking ID: ${trackingId.toUpperCase()}`, 10, y); y += lineHeight;
+  doc.text(`Category   : ${category}`, 10, y); y += lineHeight + 2;
 
-  y += lineHeight;
-  doc.text("━━━━━━━━━━━━━━━━━━━━━━━━━━━━", 20, y); y += lineHeight;
-  doc.text("Thank you for shopping with us! ❤️", 20, y);
+  // Separator
+  doc.text("=".repeat(32), 10, y); y += lineHeight;
 
-  // Download the PDF
-  doc.save(`OrderReceipt_${trackingId}.pdf`);
+  // Thank you note
+  doc.text("Thank you for shopping with us!", 40, y, { align: "center" }); y += lineHeight;
+  doc.text("❤️", 40, y, { align: "center" });
+
+  // Generate Blob URL and use Web Share if available
+  const pdfBlob = doc.output('blob');
+  const pdfUrl = URL.createObjectURL(pdfBlob);
+
+  if (navigator.canShare && navigator.canShare({ files: [new File([pdfBlob], `Receipt_${trackingId}.pdf`, { type: 'application/pdf' })] })) {
+    const file = new File([pdfBlob], `Receipt_${trackingId}.pdf`, { type: 'application/pdf' });
+    navigator.share({
+      title: 'Order Receipt',
+      text: 'Here is your receipt from Cute Printed Nightwears by Radhika.',
+      files: [file]
+    }).catch(() => {
+      window.open(pdfUrl, '_blank'); // Fallback if sharing is canceled
+    });
+  } else {
+    // Fallback: trigger download
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = `Receipt_${trackingId}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }
 }
 
 function showToast(message) {
