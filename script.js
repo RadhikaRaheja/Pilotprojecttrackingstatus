@@ -24,7 +24,14 @@ function showPopup(row, trackingId) {
       <p><b>Courier:</b> <a href="${couriers[row["Courier Name"]] || '#'}" target="_blank">${row["Courier Name"]}</a></p>
      <p><b>Tracking ID:</b> <span class="tracking-id" id="copyTarget">${trackingId.toUpperCase()}</span><button class="copy-btn" onclick="copyTrackingID()" title="Copy to clipboard">📝</button></p>
       <p><b>Category:</b> ${row["Category"] || ''}</p>
-     <p><button class="share-btn" onclick="generatePDFReceipt('${trackingId}', '${row["Customer Name"]}', '${row["Location (Pincode)"]}', '${row["Courier Name"]}', '${row["Category"] || ''}', '${formatDate(row.Date)}')">📄 Download PDF Receipt</button></p>
+     <p><button class="share-btn" onclick="generateAndShareReceipt({
+  date: '${formatDate(row.Date)}',
+  name: '${row["Customer Name"]}',
+  pincode: '${row["Location (Pincode)"]}',
+  courier: '${row["Courier Name"]}',
+  trackingId: '${trackingId.toUpperCase()}',
+  category: '${row["Category"] || ''}'
+})">📄 Share Receipt</button></p>
  </div>
 
   `;
