@@ -40,30 +40,53 @@ function copyTrackingID() {
 }
 
 function shareTrackingInfo(trackingId, name, location, courier, category, date) {
-  const message = `📦 *Order Details*:
-👤 *Name:* ${name}
-📍 *Location:* ${location}
+  const trackingLinks = {
+    dtdc: `https://www.dtdc.in/track-trace.aspx?cn_no=${trackingId}`,
+    bluedart: `https://www.bluedart.com/tracking`,
+    fedex: `https://www.fedex.com/fedextrack/?tracknumbers=${trackingId}`,
+    delhivery: `https://www.delhivery.com/tracking?waybill=${trackingId}`,
+    indiapost: `https://www.indiapost.gov.in/VAS/Pages/trackconsignment.aspx`,
+    amazon: `https://track.amazon.in/`,
+    firstflight: `https://firstflightme.com/`,
+    shreetirupati: `http://www.shreetirupaticourier.net/index.aspx`,
+    mahavir: `http://shreemahavircourier.com/`,
+    gati: `https://www.gati.com/track-by-docket/`,
+    madhur: `https://www.madhurcouriers.in/(S(5mhmi5rxen0hy3xgxqtis5jr))/CNoteTracking`,
+    maruti: `https://www.shreemaruti.com/track-your-shipment/`,
+    skyking: `https://skyking.co/track`,
+    trackon: `https://www.trackon.in/courier-tracking`,
+    tpc: `https://www.tpcindia.com/`,
+    ecom: `https://www.ecomexpress.in/`,
+    anjani: `http://www.shreeanjanicourier.com/`,
+    gms: `https://www.gmsworldwide.com/`
+  };
+
+  const courierKey = Object.keys(trackingLinks).find(key => courier.toLowerCase().includes(key));
+  const trackingURL = courierKey ? trackingLinks[courierKey] : null;
+
+  const message = `🧾 *Order Receipt*\n
 📅 *Date:* ${date}
+👤 *Name:* ${name}
+📍 *Pincode:* ${location}
+
 🚚 *Courier:* ${courier}
+🔗 *Track:* ${trackingURL || 'N/A'}
+
 🔢 *Tracking ID:* ${trackingId}
-📂 *Category:* ${category}`;
+📂 *Category:* ${category}
+
+━━━━━━━━━━━━━━━━━━
+Thank you for shopping with us! ❤️`;
 
   const encodedMsg = encodeURIComponent(message);
-
-  // For WhatsApp Web or App
   const waLink = `https://wa.me/?text=${encodedMsg}`;
 
-  // Try Web Share API first
   if (navigator.share) {
     navigator.share({
-      title: 'Order Tracking Details',
-      text: message,
-    }).catch(err => {
-      // fallback if user cancels or fails
-      window.open(waLink, '_blank');
-    });
+      title: 'Order Receipt',
+      text: message
+    }).catch(() => window.open(waLink, '_blank'));
   } else {
-    // Fallback for devices without Web Share API
     window.open(waLink, '_blank');
   }
 }
