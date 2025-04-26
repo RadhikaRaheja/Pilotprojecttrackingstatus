@@ -72,7 +72,7 @@ function shareReceiptMessage(order) {
   );
   const trackingURL = courierKey ? trackingLinks[courierKey] : 'Tracking link unavailable';
 
-  const message = `
+  const receiptMessage = `
 🧾 *Order Receipt*
 
 *Cute Printed Nightwears by Radhika* 🎀
@@ -84,14 +84,14 @@ function shareReceiptMessage(order) {
 🚚 *Courier:* ${order.courier}
 🔗 *Track:* ${trackingURL}
 
-🔢 *Tracking ID:* \`${order.trackingId}\`
+🔢 *Tracking ID:* ${order.trackingId.toUpperCase()}
 📂 *Category:* ${order.category}
 
 ━━━━━━━━━━━━━━━━━━━━━━  
 Thank you for shopping with us! ❤️`;
 
-const secondMessage = `
-🔁{order.trackingId.toUpperCase()}`;
+  const secondMessage = `
+ {order.trackingId.toUpperCase()}`;
 
   const combined = encodeURIComponent(`${receiptMessage}\n\n${secondMessage}`);
   const whatsappURL = `https://wa.me/?text=${combined}`;
