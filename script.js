@@ -90,13 +90,17 @@ function shareReceiptMessage(order) {
 ━━━━━━━━━━━━━━━━━━━━━━  
 Thank you for shopping with us! ❤️`;
 
-  const encodedMessage = encodeURIComponent(message);
-  const whatsappURL = `https://wa.me/?text=${encodedMessage}`;
+const secondMessage = `
+🔁 You can copy your Tracking ID easily here:
+${order.trackingId.toUpperCase()}`;
+
+  const combined = encodeURIComponent(`${receiptMessage}\n\n${secondMessage}`);
+  const whatsappURL = `https://wa.me/?text=${combined}`;
 
   if (navigator.share) {
     navigator.share({
       title: 'Order Receipt',
-      text: message
+      text: `${receiptMessage}\n\n${secondMessage}`
     }).catch(() => {
       window.open(whatsappURL, '_blank');
     });
