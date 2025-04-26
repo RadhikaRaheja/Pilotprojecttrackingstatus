@@ -91,8 +91,7 @@ function shareReceiptMessage(order) {
 Thank you for shopping with us! ❤️`;
 
 const secondMessage = `
-🔁 You can copy your Tracking ID easily here:
-${order.trackingId.toUpperCase()}`;
+🔁{order.trackingId.toUpperCase()}`;
 
   const combined = encodeURIComponent(`${receiptMessage}\n\n${secondMessage}`);
   const whatsappURL = `https://wa.me/?text=${combined}`;
