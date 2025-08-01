@@ -228,10 +228,17 @@ function renderResults() {
       <td>${courierDisplay}</td>
       <td>${row["Tracking ID"]}</td>
       <td>${row["Category"] || ''}</td>
+      <td class="live-status-cell" id="status_${row["Tracking ID"]}"></td>
     `;
 
     tr.onclick = () => showPopup(row, trackingId);
     table.appendChild(tr);
+    setTimeout(() => {
+  const el = document.getElementById(`status_${row["Tracking ID"]}`);
+  if (el && row["Tracking ID"] && row["Tracking ID"].length > 5) {
+    el.innerHTML = `<span data-ptwidget-type="button" data-ptwidget-track-number="${row["Tracking ID"]}">Track Live</span>`;
+  }
+}, 10);
   });
 
   renderPaginationControls();
