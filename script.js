@@ -1,12 +1,13 @@
 let data = [], filteredData = [], couriers = {}, courierSlugMap = {}, currentPage = 1, entriesPerPage = 10;
 
-// === UI / Search UI helpers ===
+// ================== UI & SEARCH ==================
 function handleSearchFieldChange() {
   const field = document.getElementById('searchField').value;
   document.getElementById('searchInput').style.display = (field === 'Date' || field === 'Courier Name') ? 'none' : 'inline-block';
   document.getElementById('dateInput').style.display = field === 'Date' ? 'inline-block' : 'none';
   document.getElementById('courierDropdown').style.display = field === 'Courier Name' ? 'inline-block' : 'none';
 }
+
 function formatDate(inputDate) {
   const date = new Date(inputDate);
   if (isNaN(date)) return '';
@@ -14,7 +15,7 @@ function formatDate(inputDate) {
   return date.toLocaleDateString('en-GB', options).replace(/ /g, '-');
 }
 
-// === Order details popup (unchanged) ===
+// ================== ORDER DETAIL POPUP ==================
 function showPopup(row, trackingId) {
   const content = `
     <div class="popup-content">
@@ -23,8 +24,7 @@ function showPopup(row, trackingId) {
       <p><b>Location:</b> ${row["Location (Pincode)"]}</p>
       <p><b>Courier:</b> <a href="${couriers[row["Courier Name"]] || '#'}" target="_blank">${row["Courier Name"]}</a></p>
       <p><b>Tracking ID:</b> <span class="tracking-id" id="copyTarget">${trackingId.toUpperCase()}</span>
-         <button class="copy-btn" onclick="copyTrackingID()" title="Copy to clipboard">📝</button>
-      </p>
+         <button class="copy-btn" onclick="copyTrackingID()" title="Copy to clipboard">📝</button></p>
       <p><b>Category:</b> ${row["Category"] || ''}</p>
       <p><button class="share-btn" onclick="shareReceiptMessage({
         date: '${formatDate(row.Date)}',
@@ -39,39 +39,56 @@ function showPopup(row, trackingId) {
   document.getElementById('popupContent').innerHTML = content;
   document.getElementById('popupOverlay').style.display = 'flex';
 }
+
 function copyTrackingID() {
   const trackingText = document.getElementById("copyTarget").innerText;
   navigator.clipboard.writeText(trackingText)
     .then(() => showToast("📋 Copied to clipboard!"))
     .catch(() => showToast("❌ Failed to copy."));
 }
-// ...your shareReceiptMessage, showToast, hidePopup, paginate, renderPaginationControls, prevPage, nextPage, jumpToPage (unchanged)...
 
-// === Data Loaders / Lookup ===
+// ========= ORDER SHARING, TOAST, PAGINATION ETC (UNCHANGED) =========
+// ... keep rest of your helper functions as before ...
+
+// ================== DATA LOADING ==================
 async function fetchData() {
   document.querySelector('.loading').style.display = 'block';
-  const response = await fetch('https://opensheet.elk.sh/1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw/Daily%20Sales%20record');
-  let result = await response.json();
-  const threeMonthsAgo = new Date();
-  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-  data = result.filter(row => new Date(row.Date) >= threeMonthsAgo);
-  filteredData = data;
+  try {
+    const response = await fetch('https://opensheet.elk.sh/1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw/Daily%20Sales%20record');
+    let result = await response.json();
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+    data = result.filter(row => new Date(row.Date) >= threeMonthsAgo && row["Customer Name"]);
+    filteredData = data;
+    renderResults();
+  } catch (err) {
+    alert("Failed to load order data!");
+    data = [];
+    filteredData = [];
+  }
   document.querySelector('.loading').style.display = 'none';
-  renderResults();
 }
+
 async function loadCouriers() {
-  const resp = await fetch('https://opensheet.elk.sh/1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw/CourierMapping');
-  const map = await resp.json();
-  const dropdown = document.getElementById('courierDropdown');
-  map.forEach(entry => {
-    couriers[entry['Courier Name']] = entry['Courier Website Link'];
-    courierSlugMap[entry['Courier Name']] = entry['AfterShip Slug'] || "";
-    const option = document.createElement('option');
-    option.value = entry['Courier Name'];
-    option.textContent = entry['Courier Name'];
-    dropdown.appendChild(option);
-  });
+  try {
+    const resp = await fetch('https://opensheet.elk.sh/1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw/CourierMapping');
+    const map = await resp.json();
+    const dropdown = document.getElementById('courierDropdown');
+    map.forEach(entry => {
+      couriers[entry['Courier Name']] = entry['Courier Website Link'];
+      courierSlugMap[entry['Courier Name']] = entry['AfterShip Slug'] || "";
+      const option = document.createElement('option');
+      option.value = entry['Courier Name'];
+      option.textContent = entry['Courier Name'];
+      dropdown.appendChild(option);
+    });
+  } catch (e) {
+    alert("Failed to load CourierMapping!");
+    courierSlugMap = {};
+    couriers = {};
+  }
 }
+
 function filterResults() {
   let field = document.getElementById('searchField').value;
   let query = '';
@@ -87,8 +104,9 @@ function filterResults() {
   renderResults();
 }
 
-// === AfterShip API fetch for live status ===
-const AFTERSHIP_API_KEY = 'YOUR_AFTERSHIP_API_KEY'; // <-- REPLACE THIS!
+// =============== AFTERSHIP STATUS (API) ===============
+const AFTERSHIP_API_KEY = 'asat_ceab369d21a1411a988048813ded4faa'; // <-- Insert your free API key
+
 async function fetchAfterShipStatus(slug, trackingId) {
   try {
     const response = await fetch(
@@ -112,7 +130,7 @@ async function fetchAfterShipStatus(slug, trackingId) {
   }
 }
 
-// === Table render and status cell logic ===
+// =============== TABLE RENDER ===============
 function renderResults() {
   const table = document.getElementById('resultsTable');
   table.innerHTML = '';
@@ -133,6 +151,7 @@ function renderResults() {
         courierDisplay = `<span style="color:#888;">N/A</span>`;
       }
     }
+
     tr.innerHTML = `
       <td>${formatDate(row.Date)}</td>
       <td>${row["Customer Name"]}</td>
@@ -142,14 +161,16 @@ function renderResults() {
       <td>${row["Category"] || ''}</td>
       <td class="live-status-cell" id="status_${trackingId}"><span class="status-loading">Loading…</span></td>
     `;
-    // Row click: show customer popup unless status cell was clicked
+
+    // Prevent row click if status is clicked!
     tr.onclick = (e) => {
       if (e.target.classList.contains("status-text")) return;
       showPopup(row, trackingId);
     };
+
     table.appendChild(tr);
 
-    // --- Inline status fetch & hook for click ---
+    // --- Fetch and show inline status ---
     const slug = courierSlugMap[courierName];
     if (slug && trackingId.length > 5) {
       fetchAfterShipStatus(slug, trackingId).then(result => {
@@ -171,10 +192,9 @@ function renderResults() {
   renderPaginationControls();
 }
 
-// === AfterShip widget popup ===
+// =============== STATUS POPUP (Widget) ===============
 let aftershipWidgetLoaded = false;
 function showStatusWidgetPopup(trackingId, slug) {
-  // Remove any previous popups
   const prev = document.getElementById("statusPopupOverlay");
   if (prev) prev.remove();
   const overlay = document.createElement("div");
@@ -205,8 +225,6 @@ function showStatusWidgetPopup(trackingId, slug) {
   `;
   overlay.appendChild(popup);
   document.body.appendChild(overlay);
-
-  // Load widget script once per page
   if (!aftershipWidgetLoaded) {
     const s = document.createElement('script');
     s.src = "https://widget.aftership.com/widget.js";
@@ -219,6 +237,6 @@ function showStatusWidgetPopup(trackingId, slug) {
 }
 window.showStatusWidgetPopup = showStatusWidgetPopup;
 
-// === INIT ===
+// =============== INIT ===============
 fetchData();
 loadCouriers();
