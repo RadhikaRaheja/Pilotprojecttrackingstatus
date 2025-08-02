@@ -45,7 +45,7 @@
             <th>Courier</th>
             <th>Tracking ID</th>
             <th>Category</th>
-            <th>Status</th> 
+            <th>Status</th> <!-- ADDED -->
           </tr>
         </thead>
         <tbody id="resultsTable"></tbody>
@@ -58,12 +58,15 @@
       <button onclick="nextPage()">➡️</button>
     </div>
 
+    <!-- Your original popup for client/order details -->
     <div class="popup-overlay" id="popupOverlay">
       <div class="popup">
         <button class="close-btn" onclick="hidePopup()">Close</button>
         <div id="popupContent"></div>
       </div>
     </div>
+
+    <!-- Popup for full tracking history (added dynamically) -->
 
     <p id="copyright">© Cute Printed Nightwears by Radhika ❤️</p>
   </div>
@@ -72,7 +75,6 @@
   <a href="https://wa.me/918307358952?text=Hi%20Team,%20I%20need%20help%20tracking%20my%20order." target="_blank" class="floating-whatsapp" title="Chat with us on WhatsApp">
     <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" />
   </a>
-<div id="toast" class="toast">📋 Copied to clipboard!</div>
-  <script src="https://posttrack.com/widgets/track-button.js" async></script>
+  <div id="toast" class="toast">📋 Copied to clipboard!</div>
 </body>
 </html>
