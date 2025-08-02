@@ -1,6 +1,6 @@
 let data = [], filteredData = [], couriers = {}, courierSlugMap = {}, currentPage = 1, entriesPerPage = 10;
 
-// ================== UI & SEARCH ==================
+// ================== UI & SEARCH CONTROLS ==================
 function handleSearchFieldChange() {
   const field = document.getElementById('searchField').value;
   document.getElementById('searchInput').style.display = (field === 'Date' || field === 'Courier Name') ? 'none' : 'inline-block';
@@ -15,7 +15,7 @@ function formatDate(inputDate) {
   return date.toLocaleDateString('en-GB', options).replace(/ /g, '-');
 }
 
-// ================== ORDER DETAIL POPUP ==================
+// ============ ORDER DETAILS POPUP ===========
 function showPopup(row, trackingId) {
   const content = `
     <div class="popup-content">
@@ -47,10 +47,113 @@ function copyTrackingID() {
     .catch(() => showToast("❌ Failed to copy."));
 }
 
-// ========= ORDER SHARING, TOAST, PAGINATION ETC (UNCHANGED) =========
-// ... keep rest of your helper functions as before ...
+function shareReceiptMessage(order) {
+  const trackingLinks = {
+    dtdc: `https://www.dtdc.in/trace.asp`,
+    bluedart: `https://www.bluedart.com/tracking`,
+    fedex: `https://www.fedex.com/fedextrack/`,
+    delhivery: `https://www.delhivery.com/`,
+    indiapost: `https://www.indiapost.gov.in/VAS/Pages/trackconsignment.aspx`,
+    amazon: `https://track.amazon.in/`,
+    firstflight: `https://firstflightme.com/`,
+    shreetirupati: `http://www.shreetirupaticourier.net/index.aspx`,
+    mahavir: `http://shreemahavircourier.com/`,
+    gati: `https://www.gati.com/track-by-docket/`,
+    madhur: `https://www.madhurcouriers.in/(S(5mhmi5rxen0hy3xgxqtis5jr))/CNoteTracking`,
+    maruti: `https://www.shreemaruti.com/track-your-shipment/`,
+    skyking: `https://skyking.co/track`,
+    trackon: `https://www.trackon.in/courier-tracking`,
+    tpc: `https://www.tpcindia.com/`,
+    ecom: `https://www.ecomexpress.in/`,
+    anjani: `http://www.shreeanjanicourier.com/`,
+    gms: `https://www.gmsworldwide.com/`
+  };
 
-// ================== DATA LOADING ==================
+  const courierKey = Object.keys(trackingLinks).find(key =>
+    order.courier.toLowerCase().includes(key)
+  );
+  const trackingURL = courierKey ? trackingLinks[courierKey] : 'Tracking link unavailable';
+
+  const receiptMessage = `
+🧾 *Order Receipt*
+
+*Cute Printed Nightwears by Radhika* 🎀
+
+📅 *Date:* ${order.date}
+👤 *Name:* ${order.name}
+📍 *Pincode:* ${order.pincode}
+
+🚚 *Courier:* ${order.courier}
+🔗 *Track:* ${trackingURL}
+
+🔢 *Tracking ID:* ${order.trackingId.toUpperCase()}
+📂 *Category:* ${order.category}
+
+━━━━━━━━━━━━━━━━━━━━━━  
+Thank you for shopping with us! ❤️`;
+
+  const encodedMessage = encodeURIComponent(receiptMessage);
+  const whatsappURL = `https://wa.me/?text=${encodedMessage}`;
+
+  if (navigator.share) {
+    navigator.share({
+      title: 'Order Receipt',
+      text: receiptMessage
+    }).catch(() => {
+      window.open(whatsappURL, '_blank');
+    });
+  } else {
+    window.open(whatsappURL, '_blank');
+  }
+}
+
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.innerText = message;
+  toast.classList.add("show");
+  setTimeout(() => { toast.classList.remove("show"); }, 2500);
+}
+
+function hidePopup() {
+  document.getElementById('popupOverlay').style.display = 'none';
+}
+
+function paginate(data, page) {
+  const start = (page - 1) * entriesPerPage;
+  return data.slice(start, start + entriesPerPage);
+}
+
+function renderPaginationControls() {
+  const totalPages = Math.ceil(filteredData.length / entriesPerPage);
+  document.getElementById('totalPages').textContent = totalPages;
+  document.getElementById('pageNumber').value = currentPage;
+}
+
+function prevPage() {
+  if (currentPage > 1) {
+    currentPage--;
+    renderResults();
+  }
+}
+
+function nextPage() {
+  const totalPages = Math.ceil(filteredData.length / entriesPerPage);
+  if (currentPage < totalPages) {
+    currentPage++;
+    renderResults();
+  }
+}
+
+function jumpToPage() {
+  const input = parseInt(document.getElementById('pageNumber').value);
+  const totalPages = Math.ceil(filteredData.length / entriesPerPage);
+  if (input >= 1 && input <= totalPages) {
+    currentPage = input;
+    renderResults();
+  }
+}
+
+// =============== DATA LOAD SECTION ===============
 async function fetchData() {
   document.querySelector('.loading').style.display = 'block';
   try {
@@ -89,23 +192,26 @@ async function loadCouriers() {
   }
 }
 
+// =============== SEARCH FILTER ===============
 function filterResults() {
   let field = document.getElementById('searchField').value;
   let query = '';
   if (field === 'Date') query = formatDate(document.getElementById('dateInput').value);
   else if (field === 'Courier Name') query = document.getElementById('courierDropdown').value;
   else query = document.getElementById('searchInput').value.toLowerCase();
+
   filteredData = data.filter(row => {
     if (!row[field]) return false;
     let value = field === 'Date' ? formatDate(row[field]) : row[field].toLowerCase();
     return value.includes(query);
   });
+
   currentPage = 1;
   renderResults();
 }
 
-// =============== AFTERSHIP STATUS (API) ===============
-const AFTERSHIP_API_KEY = 'asat_ceab369d21a1411a988048813ded4faa'; // <-- Insert your free API key
+// =============== AFTERSHIP STATUS FETCH ===============
+const AFTERSHIP_API_KEY = "asat_ceab369d21a1411a988048813ded4faa"; // Your key, as provided
 
 async function fetchAfterShipStatus(slug, trackingId) {
   try {
@@ -130,7 +236,7 @@ async function fetchAfterShipStatus(slug, trackingId) {
   }
 }
 
-// =============== TABLE RENDER ===============
+// =============== TABLE RENDER WITH STATUS LOGIC ===============
 function renderResults() {
   const table = document.getElementById('resultsTable');
   table.innerHTML = '';
@@ -139,6 +245,7 @@ function renderResults() {
     const tr = document.createElement('tr');
     const courierName = (row["Courier Name"] || '').trim();
     const trackingId = (row["Tracking ID"] || '').trim();
+
     let courierDisplay = '';
     if (courierName) {
       courierDisplay = `<a href="${couriers[courierName] || '#'}" target="_blank">${courierName}</a>`;
@@ -162,15 +269,14 @@ function renderResults() {
       <td class="live-status-cell" id="status_${trackingId}"><span class="status-loading">Loading…</span></td>
     `;
 
-    // Prevent row click if status is clicked!
+    // Prevent row click if status cell was clicked!
     tr.onclick = (e) => {
       if (e.target.classList.contains("status-text")) return;
       showPopup(row, trackingId);
     };
-
     table.appendChild(tr);
 
-    // --- Fetch and show inline status ---
+    // --- Fetch and show inline status in Status column ---
     const slug = courierSlugMap[courierName];
     if (slug && trackingId.length > 5) {
       fetchAfterShipStatus(slug, trackingId).then(result => {
@@ -192,7 +298,7 @@ function renderResults() {
   renderPaginationControls();
 }
 
-// =============== STATUS POPUP (Widget) ===============
+// =============== STATUS TIMELINE POPUP ===============
 let aftershipWidgetLoaded = false;
 function showStatusWidgetPopup(trackingId, slug) {
   const prev = document.getElementById("statusPopupOverlay");
