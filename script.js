@@ -1,6 +1,7 @@
 let data = [], filteredData = [], couriers = {}, courierSlugMap = {}, currentPage = 1, entriesPerPage = 10;
 
-// ================== UI & SEARCH CONTROLS ==================
+const AFTERSHIP_API_KEY = "asat_ceab369d21a1411a988048813ded4faa"; // YOUR API KEY
+
 function handleSearchFieldChange() {
   const field = document.getElementById('searchField').value;
   document.getElementById('searchInput').style.display = (field === 'Date' || field === 'Courier Name') ? 'none' : 'inline-block';
@@ -15,7 +16,6 @@ function formatDate(inputDate) {
   return date.toLocaleDateString('en-GB', options).replace(/ /g, '-');
 }
 
-// ============ ORDER DETAILS POPUP ===========
 function showPopup(row, trackingId) {
   const content = `
     <div class="popup-content">
@@ -23,18 +23,16 @@ function showPopup(row, trackingId) {
       <p><b>Name:</b> ${row["Customer Name"]}</p>
       <p><b>Location:</b> ${row["Location (Pincode)"]}</p>
       <p><b>Courier:</b> <a href="${couriers[row["Courier Name"]] || '#'}" target="_blank">${row["Courier Name"]}</a></p>
-      <p><b>Tracking ID:</b> <span class="tracking-id" id="copyTarget">${trackingId.toUpperCase()}</span>
-         <button class="copy-btn" onclick="copyTrackingID()" title="Copy to clipboard">📝</button></p>
+     <p><b>Tracking ID:</b> <span class="tracking-id" id="copyTarget">${trackingId.toUpperCase()}</span><button class="copy-btn" onclick="copyTrackingID()" title="Copy to clipboard">📝</button></p>
       <p><b>Category:</b> ${row["Category"] || ''}</p>
-      <p><button class="share-btn" onclick="shareReceiptMessage({
-        date: '${formatDate(row.Date)}',
-        name: '${row["Customer Name"]}',
-        pincode: '${row["Location (Pincode)"]}',
-        courier: '${row["Courier Name"]}',
-        trackingId: '${trackingId.toUpperCase()}',
-        category: '${row["Category"] || ""}'
-      })">📤 Share Receipt</button></p>
-    </div>
+     <p><button class="share-btn" onclick="shareReceiptMessage({
+    date: '${formatDate(row.Date)}',
+    name: '${row["Customer Name"]}',
+    pincode: '${row["Location (Pincode)"]}',
+    courier: '${row["Courier Name"]}',
+    trackingId: '${trackingId.toUpperCase()}',
+    category: '${row["Category"] || ""}'
+  })">📤 Share Receipt</button></p>
   `;
   document.getElementById('popupContent').innerHTML = content;
   document.getElementById('popupOverlay').style.display = 'flex';
@@ -153,46 +151,32 @@ function jumpToPage() {
   }
 }
 
-// =============== DATA LOAD SECTION ===============
 async function fetchData() {
   document.querySelector('.loading').style.display = 'block';
-  try {
-    const response = await fetch('https://opensheet.elk.sh/1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw/Daily%20Sales%20record');
-    let result = await response.json();
-    const threeMonthsAgo = new Date();
-    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-    data = result.filter(row => new Date(row.Date) >= threeMonthsAgo && row["Customer Name"]);
-    filteredData = data;
-    renderResults();
-  } catch (err) {
-    alert("Failed to load order data!");
-    data = [];
-    filteredData = [];
-  }
+  const response = await fetch('https://opensheet.elk.sh/1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw/Daily%20Sales%20record');
+  let result = await response.json();
+  const threeMonthsAgo = new Date();
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+  data = result.filter(row => new Date(row.Date) >= threeMonthsAgo);
+  filteredData = data;
   document.querySelector('.loading').style.display = 'none';
+  renderResults();
 }
 
 async function loadCouriers() {
-  try {
-    const resp = await fetch('https://opensheet.elk.sh/1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw/CourierMapping');
-    const map = await resp.json();
-    const dropdown = document.getElementById('courierDropdown');
-    map.forEach(entry => {
-      couriers[entry['Courier Name']] = entry['Courier Website Link'];
-      courierSlugMap[entry['Courier Name']] = entry['AfterShip Slug'] || "";
-      const option = document.createElement('option');
-      option.value = entry['Courier Name'];
-      option.textContent = entry['Courier Name'];
-      dropdown.appendChild(option);
-    });
-  } catch (e) {
-    alert("Failed to load CourierMapping!");
-    courierSlugMap = {};
-    couriers = {};
-  }
+  const resp = await fetch('https://opensheet.elk.sh/1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw/CourierMapping');
+  const map = await resp.json();
+  const dropdown = document.getElementById('courierDropdown');
+  map.forEach(entry => {
+    couriers[entry['Courier Name']] = entry['Courier Website Link'];
+    courierSlugMap[entry['Courier Name']] = entry['AfterShip Slug'] || "";
+    const option = document.createElement('option');
+    option.value = entry['Courier Name'];
+    option.textContent = entry['Courier Name'];
+    dropdown.appendChild(option);
+  });
 }
 
-// =============== SEARCH FILTER ===============
 function filterResults() {
   let field = document.getElementById('searchField').value;
   let query = '';
@@ -210,39 +194,37 @@ function filterResults() {
   renderResults();
 }
 
-// =============== AFTERSHIP STATUS FETCH ===============
-const AFTERSHIP_API_KEY = "asat_ceab369d21a1411a988048813ded4faa"; // Your key, as provided
-
+// ----------- AFTERSHIP STATUS FETCH LOGIC -----------
 async function fetchAfterShipStatus(slug, trackingId) {
   try {
-    const response = await fetch(
-      `https://api.aftership.com/v4/trackings/${slug}/${trackingId}`,
+    const response = await fetch(`https://api.aftership.com/v4/trackings/${slug}/${trackingId}`,
       {
         headers: {
           'aftership-api-key': AFTERSHIP_API_KEY,
           'Content-Type': 'application/json'
         }
-      }
-    );
+      });
     if (!response.ok) throw new Error("Unable to fetch tracking");
     const resData = await response.json();
     let status = "Status unavailable";
     if (resData.data && resData.data.tracking) {
       status = resData.data.tracking.tag || resData.data.tracking.subtag || "Status unavailable";
     }
-    return {status, details: resData.data.tracking};
+    return { status, details: resData.data.tracking };
   } catch (e) {
-    return {status: "Status unavailable", details: null};
+    return { status: "Status unavailable", details: null };
   }
 }
 
-// =============== TABLE RENDER WITH STATUS LOGIC ===============
 function renderResults() {
   const table = document.getElementById('resultsTable');
   table.innerHTML = '';
+
   document.getElementById('resultsCount').textContent = `🔍 Showing ${filteredData.length} results`;
+
   paginate(filteredData, currentPage).forEach(row => {
     const tr = document.createElement('tr');
+
     const courierName = (row["Courier Name"] || '').trim();
     const trackingId = (row["Tracking ID"] || '').trim();
 
@@ -264,21 +246,22 @@ function renderResults() {
       <td>${row["Customer Name"]}</td>
       <td>${row["Location (Pincode)"]}</td>
       <td>${courierDisplay}</td>
-      <td>${trackingId}</td>
+      <td>${row["Tracking ID"]}</td>
       <td>${row["Category"] || ''}</td>
-      <td class="live-status-cell" id="status_${trackingId}"><span class="status-loading">Loading…</span></td>
+      <td class="live-status-cell" id="status_${trackingId}"><span class="status-loading">Loading...</span></td>
     `;
 
-    // Prevent row click if status cell was clicked!
-    tr.onclick = (e) => {
+    // Special click logic: opens order-details by default, or widget popup if status is clicked
+    tr.onclick = e => {
       if (e.target.classList.contains("status-text")) return;
       showPopup(row, trackingId);
     };
+
     table.appendChild(tr);
 
-    // --- Fetch and show inline status in Status column ---
+    // ----- Inline live status fetch + popup trigger -----
     const slug = courierSlugMap[courierName];
-    if (slug && trackingId.length > 5) {
+    if (slug && trackingId.length > 4) {
       fetchAfterShipStatus(slug, trackingId).then(result => {
         const cell = document.getElementById(`status_${trackingId}`);
         if (!cell) return;
@@ -295,10 +278,11 @@ function renderResults() {
       if (cell) cell.innerHTML = `<span style="color:#999;">N/A</span>`;
     }
   });
+
   renderPaginationControls();
 }
 
-// =============== STATUS TIMELINE POPUP ===============
+// ----------- AFTERSHIP WIDGET POPUP LOGIC -----------
 let aftershipWidgetLoaded = false;
 function showStatusWidgetPopup(trackingId, slug) {
   const prev = document.getElementById("statusPopupOverlay");
@@ -331,6 +315,7 @@ function showStatusWidgetPopup(trackingId, slug) {
   `;
   overlay.appendChild(popup);
   document.body.appendChild(overlay);
+
   if (!aftershipWidgetLoaded) {
     const s = document.createElement('script');
     s.src = "https://widget.aftership.com/widget.js";
@@ -343,6 +328,6 @@ function showStatusWidgetPopup(trackingId, slug) {
 }
 window.showStatusWidgetPopup = showStatusWidgetPopup;
 
-// =============== INIT ===============
+// ------------- INIT DATA ---------------
 fetchData();
 loadCouriers();
